@@ -25,7 +25,6 @@ namespace Rivet {
        m_ptcut=ptcut;
        m_Bdef=bdef;
        m_parton=cparton;
-       MSG_INFO("constructor, bool cparton:" << cparton);
     }
 
 
@@ -87,12 +86,9 @@ namespace Rivet {
         }
 
       Jets bjets,Bjets,ljets;
-      MSG_INFO("all jets:" << alljets.size());
-      MSG_INFO("m_parton:" << m_parton);
 
       foreach (Jet jet, alljets) {
           if (m_parton==0){  //hadron level
-              MSG_INFO("in hadron level");
               if(jet.bTagged()){
                   Particles btags = jet.bTags();
                   if(btags.size() >= m_Bdef) {   //is this sufficient to have a fat bjet?
@@ -103,7 +99,6 @@ namespace Rivet {
                 }else ljets.push_back(jet);
 
             }else{ //parton level
-              MSG_INFO("in parton level");
               size_t nb(0);
               Particles jet_content= jet.constituents();
               foreach(Particle part, jet_content){
@@ -111,14 +106,11 @@ namespace Rivet {
                 }
               if (nb>0){
                   if (nb >= m_Bdef){
-                      MSG_INFO("B jet");
                       Bjets.push_back(jet);
                     }else {
-                      MSG_INFO("b jet");
                       bjets.push_back(jet);
                     }
                 }else{
-                  MSG_INFO("l jet");
                   ljets.push_back(jet);
                 }
             }
