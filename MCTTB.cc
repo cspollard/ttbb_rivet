@@ -17,13 +17,14 @@ namespace Rivet {
   public:
 
     /// Constructor
-    MCTTB(const string& name="MCTTB", size_t n_ljet=4, size_t n_bjet=2, size_t n_Bjet=0, double ptcut=15.0, size_t bdef=2)
+    MCTTB(const string& name="MCTTB", size_t n_ljet=4, size_t n_bjet=2, size_t n_Bjet=0, double ptcut=15.0, size_t bdef=2, bool parton=false)
       : Analysis(name), _h_pT_ljet(n_ljet), _h_pT_bjet(n_bjet),_h_pT_Bjet(n_Bjet),_h_Bjet_btags(n_Bjet)
     {  num_Bjets = n_Bjet;
        num_bjets = n_bjet;
-       num_ljets = n_ljet;
-       m_ptcut=ptcut;
-       m_Bdef=bdef;
+        num_ljets = n_ljet;
+         m_ptcut=ptcut;
+          m_Bdef=bdef;
+           m_parton=parton;
     }
 
 
@@ -46,23 +47,23 @@ namespace Rivet {
 
 
       for (size_t i = 0; i < num_ljets; ++i) {
-        const string pTname = "light_jet_pT_" + to_str(i+1);
-        const double pTmax = 1.0/(double(i)+3.0) * sqrts/GeV/2.0;
-         _h_pT_ljet[i] = bookHisto1D(pTname, logspace(nbins_pT, m_ptcut, pTmax));
+          const string pTname = "light_jet_pT_" + to_str(i+1);
+          const double pTmax = 1.0/(double(i)+3.0) * sqrts/GeV/2.0;
+          _h_pT_ljet[i] = bookHisto1D(pTname, logspace(nbins_pT, m_ptcut, pTmax));
 
         }
 
       for (size_t i = 0; i < num_bjets; ++i) {
-        const string pTname = "b_jet_pT_" + to_str(i+1);
-        const double pTmax = 1.0/(double(i)+3.0) * sqrts/GeV/2.0;
-         _h_pT_bjet[i] = bookHisto1D(pTname, logspace(nbins_pT, m_ptcut, pTmax));
+          const string pTname = "b_jet_pT_" + to_str(i+1);
+          const double pTmax = 1.0/(double(i)+3.0) * sqrts/GeV/2.0;
+          _h_pT_bjet[i] = bookHisto1D(pTname, logspace(nbins_pT, m_ptcut, pTmax));
         }
 
       for (size_t i = 0; i < num_Bjets; ++i) {
-        const string pTname = "B_jet_pT_" + to_str(i+1);
-        const double pTmax = 1.0/(double(i)+3.0) * sqrts/GeV/2.0;
-        _h_Bjet_btags[i] = bookHisto1D("btags_Bjet"+to_str(i+1),10,0 -0.5 ,10 -0.5);
-        _h_pT_Bjet[i] = bookHisto1D(pTname, logspace(nbins_pT, m_ptcut, pTmax));
+          const string pTname = "B_jet_pT_" + to_str(i+1);
+          const double pTmax = 1.0/(double(i)+3.0) * sqrts/GeV/2.0;
+          _h_Bjet_btags[i] = bookHisto1D("btags_Bjet"+to_str(i+1),10,0 -0.5 ,10 -0.5);
+          _h_pT_Bjet[i] = bookHisto1D(pTname, logspace(nbins_pT, m_ptcut, pTmax));
         }
 
       _h_ljet_multi = bookHisto1D("ljet_multi", 9, num_ljets-0.5, num_ljets + 9 -0.5);
@@ -80,23 +81,38 @@ namespace Rivet {
       const FastJets& jetpro = apply<FastJets>(event, "Jets");
       const Jets alljets = jetpro.jetsByPt(Cuts::pT>m_ptcut*GeV);
       if (alljets.size() < 4) {
-        MSG_DEBUG("Event failed jet multiplicity cut");
-        vetoEvent;
-      }
+          MSG_DEBUG("Event failed jet multiplicity cut");
+          vetoEvent;
+        }
 
       Jets bjets,Bjets,ljets;
       foreach (Jet jet, alljets) {
-          if(jet.bTagged()){
-              Particles btags = jet.bTags();
-              if(btags.size() > m_Bdef) {   //is this sufficient to have a fat bjet?
-                  Bjets.push_back(jet);
-              }else{
-                  bjets.push_back(jet);
-              }
-            }else ljets.push_back(jet);
+          if (!m_parton){  //hadron level
+              if(jet.bTagged()){
+                  Particles btags = jet.bTags();
+                  if(btags.size() >= m_Bdef) {   //is this sufficient to have a fat bjet?
+                      Bjets.push_back(jet);
+                    }else{
+                      bjets.push_back(jet);
+                    }
+                }else ljets.push_back(jet);
 
+            }else{ //parton level
+              size_t nb(0);
+              Particles jet_content= jet.constituents();
+              foreach(Particle part, jet_content){
+                  if (part.hasBottom()) nb++;
+                }
+              if (nb>0){
+                  if (nb >= m_Bdef){
+                      Bjets.push_back(jet);
+                    }else {
+                      bjets.push_back(jet);
+                    }
+                }else ljets.push_back(jet);
+
+            }
         }
-
       if (ljets.size() < num_ljets) vetoEvent;
       if (bjets.size() < num_bjets) vetoEvent;
       if (Bjets.size() < num_Bjets) vetoEvent;
@@ -104,15 +120,15 @@ namespace Rivet {
 
       //fill histograms:
       for (size_t i=0; i<num_ljets;i++){
-         _h_pT_ljet[i]->fill(ljets[i].pT(), weight);
+          _h_pT_ljet[i]->fill(ljets[i].pT(), weight);
         }
       for (size_t i=0; i<num_bjets;i++){
-         _h_pT_bjet[i]->fill(bjets[i].pT(), weight);
+          _h_pT_bjet[i]->fill(bjets[i].pT(), weight);
         }
       for (size_t i=0; i<num_Bjets;i++){
-         _h_pT_Bjet[i]->fill(Bjets[i].pT(), weight);
-         _h_Bjet_btags[i] ->fill(Bjets[i].bTags().size(), weight);
-      }
+          _h_pT_Bjet[i]->fill(Bjets[i].pT(), weight);
+          _h_Bjet_btags[i] ->fill(Bjets[i].bTags().size(), weight);
+        }
       _h_ljet_multi->fill(ljets.size(), weight);
       _h_bjet_multi->fill(bjets.size(), weight);
       _h_Bjet_multi->fill(Bjets.size(), weight);
@@ -126,15 +142,15 @@ namespace Rivet {
       const double xs = crossSection()/picobarn;
 
       for (size_t i=0; i<num_ljets;i++){
-         scale(_h_pT_ljet[i], xs/sumOfWeights());
-      }
+          scale(_h_pT_ljet[i], xs/sumOfWeights());
+        }
       for (size_t i=0; i<num_bjets;i++){
-         scale(_h_pT_bjet[i], xs/sumOfWeights());
-      }
+          scale(_h_pT_bjet[i], xs/sumOfWeights());
+        }
       for (size_t i=0; i<num_Bjets;i++){
-         scale(_h_pT_Bjet[i], xs/sumOfWeights());
-         scale(_h_Bjet_btags[i], xs/sumOfWeights());
-      }
+          scale(_h_pT_Bjet[i], xs/sumOfWeights());
+          scale(_h_Bjet_btags[i], xs/sumOfWeights());
+        }
       scale(_h_ljet_multi, xs/sumOfWeights());
       scale(_h_bjet_multi, xs/sumOfWeights());
       scale(_h_Bjet_multi, xs/sumOfWeights());
@@ -149,6 +165,7 @@ namespace Rivet {
     size_t num_Bjets;
     double m_ptcut;
     size_t m_Bdef;
+    bool m_parton;
 
     /// @name Histograms
     // vector histograms: create with required size of jets
@@ -176,63 +193,92 @@ namespace Rivet {
   DECLARE_RIVET_PLUGIN(MCTTB);
 
 
+  //hadron level analyses
 
-  class MCTTB_L4_b2_B1_PT15 : public MCTTB {
+  class MCTTB_L2_b2_B0_PT30 : public MCTTB {
   public:
-      MCTTB_L4_b2_B1_PT15()
-        :MCTTB("MCTTB_L4_b2_B1_PT15",4,2,1,15)
-      {   }
-    };
+    MCTTB_L2_b2_B0_PT30()
+      :MCTTB("MCTTB_L2_b2_B0_PT30",2,2,0,30)
+    {   }
+  };
 
-  class MCTTB_L4_b3_B0_PT15 : public MCTTB {
+  class MCTTB_L0_b2_B0_PT30 : public MCTTB {
   public:
-      MCTTB_L4_b3_B0_PT15()
-        :MCTTB("MCTTB_L4_b3_B0_PT15",4,3,0,15)
-      {   }
-    };
+    MCTTB_L0_b2_B0_PT30()
+      :MCTTB("MCTTB_L0_b2_B0_PT30",0,2,0,30)
+    {   }
+  };
 
-  class MCTTB_L4_b3_B1_PT15 : public MCTTB {
+  class MCTTB_L0_b4_B0_PT30 : public MCTTB {
   public:
-      MCTTB_L4_b3_B1_PT15()
-        :MCTTB("MCTTB_L4_b3_B1_PT15",4,3,1,15)
-      {   }
-    };
+    MCTTB_L0_b4_B0_PT30()
+      :MCTTB("MCTTB_L0_b4_B0_PT30",0,4,0,30)
+    {   }
+  };
 
-  class MCTTB_L4_b3_B1_PT30 : public MCTTB {
+  class MCTTB_L0_b3_B1_PT30 : public MCTTB {
   public:
-      MCTTB_L4_b3_B1_PT30()
-        :MCTTB("MCTTB_L4_b3_B1_PT30",4,3,1,30)
-      {   }
-    };
+    MCTTB_L0_b3_B1_PT30()
+      :MCTTB("MCTTB_L0_b3_B1_PT30",0,3,1,30)
+    {   }
+  };
 
-  class MCTTB_L4_b3_B1_PT15_bdef3 : public MCTTB {
+  class MCTTB_L0_b2_B1_PT30 : public MCTTB {
   public:
-      MCTTB_L4_b3_B1_PT15_bdef3()
-        :MCTTB("MCTTB_L4_b3_B1_PT15_bdef3",4,3,1,15,3)
-      {   }
-    };
+    MCTTB_L0_b2_B1_PT30()
+      :MCTTB("MCTTB_L0_b2_B1_PT30",0,2,1,30)
+    {   }
+  };
 
-  class MCTTB_L4_b4_B0_PT15 : public MCTTB {
+  DECLARE_RIVET_PLUGIN(MCTTB_L2_b2_B0_PT30);
+  DECLARE_RIVET_PLUGIN(MCTTB_L0_b2_B0_PT30);
+  DECLARE_RIVET_PLUGIN(MCTTB_L0_b4_B0_PT30);
+  DECLARE_RIVET_PLUGIN(MCTTB_L0_b3_B1_PT30);
+  DECLARE_RIVET_PLUGIN(MCTTB_L0_b2_B1_PT30);
+
+
+  //parton level analyses
+
+  class MCTTB_L2_b2_B0_PT30_parton : public MCTTB {
   public:
-      MCTTB_L4_b4_B0_PT15()
-        :MCTTB("MCTTB_L4_b4_B0_PT15",4,4,0,15)
-      {   }
-    };
+    MCTTB_L2_b2_B0_PT30_parton()
+      :MCTTB("MCTTB_L2_b2_B0_PT30_parton",2,2,0,30,true)
+    {   }
+  };
 
-  class MCTTB_L4_b4_B0_PT30 : public MCTTB {
+  class MCTTB_L0_b2_B0_PT30_parton : public MCTTB {
   public:
-      MCTTB_L4_b4_B0_PT30()
-        :MCTTB("MCTTB_L4_b4_B0_PT30",4,4,0,30)
-      {   }
-    };
+    MCTTB_L0_b2_B0_PT30_parton()
+      :MCTTB("MCTTB_L0_b2_B0_PT30_parton",0,2,0,30,true)
+    {   }
+  };
 
-  DECLARE_RIVET_PLUGIN(MCTTB_L4_b2_B1_PT15);
-  DECLARE_RIVET_PLUGIN(MCTTB_L4_b3_B0_PT15);
-  DECLARE_RIVET_PLUGIN(MCTTB_L4_b3_B1_PT15);
-  DECLARE_RIVET_PLUGIN(MCTTB_L4_b3_B1_PT30);
-  DECLARE_RIVET_PLUGIN(MCTTB_L4_b3_B1_PT15_bdef3);
-  DECLARE_RIVET_PLUGIN(MCTTB_L4_b4_B0_PT15);
-  DECLARE_RIVET_PLUGIN(MCTTB_L4_b4_B0_PT30);
+  class MCTTB_L0_b4_B0_PT30_parton : public MCTTB {
+  public:
+    MCTTB_L0_b4_B0_PT30_parton()
+      :MCTTB("MCTTB_L0_b4_B0_PT30_parton",0,4,0,30,true)
+    {   }
+  };
+
+  class MCTTB_L0_b3_B1_PT30_parton : public MCTTB {
+  public:
+    MCTTB_L0_b3_B1_PT30_parton()
+      :MCTTB("MCTTB_L0_b3_B1_PT30_parton",0,3,1,30,true)
+    {   }
+  };
+
+  class MCTTB_L0_b2_B1_PT30_parton : public MCTTB {
+  public:
+    MCTTB_L0_b2_B1_PT30_parton()
+      :MCTTB("MCTTB_L0_b2_B1_PT30_parton",0,2,1,30,true)
+    {   }
+  };
+
+  DECLARE_RIVET_PLUGIN(MCTTB_L2_b2_B0_PT30_parton);
+  DECLARE_RIVET_PLUGIN(MCTTB_L0_b2_B0_PT30_parton);
+  DECLARE_RIVET_PLUGIN(MCTTB_L0_b4_B0_PT30_parton);
+  DECLARE_RIVET_PLUGIN(MCTTB_L0_b3_B1_PT30_parton);
+  DECLARE_RIVET_PLUGIN(MCTTB_L0_b2_B1_PT30_parton);
 
 
 
