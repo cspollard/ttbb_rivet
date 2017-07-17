@@ -1,6 +1,6 @@
 # BEGIN PLOT /MC_TTBAR_NO_NORM/jet.?_[1234]_pT
 XLabel=$p_\perp$ [GeV]
-YLabel=$1/\sigma \, \mathrm{d}\sigma/\mathrm{d}p_\perp$ [GeV$^{-1}$]
+YLabel=$\mathrm{d}\sigma/\mathrm{d}p_\perp$ [GeV$^{-1}$]
 LogX=1
 # END PLOT
 
@@ -23,7 +23,7 @@ Title=Transverse momentum distribution for jet 4
 # BEGIN PLOT /MC_TTBAR_NO_NORM/jet_HT
 Title=$H_T$ distribution for all jets
 XLabel=$H_T$ [GeV]
-YLabel=$1/\sigma \, \mathrm{d}\sigma/\mathrm{d}H_T$ [GeV$^{-1}$]
+YLabel=$\mathrm{d}\sigma/\mathrm{d}H_T$ [GeV$^{-1}$]
 LogX=1
 # END PLOT
 
@@ -53,44 +53,44 @@ Title=Transverse momentum distribution for light jet 2
 # BEGIN PLOT /MC_TTBAR_NO_NORM/W_mass
 Title=Mass distribution for $W$ bosons
 XLabel=$m_{jj}$ [GeV]
-YLabel=$1/\sigma \, \mathrm{d}\sigma/\mathrm{d}m_{jj}$ [GeV$^{-1}$]
+YLabel=$\mathrm{d}\sigma/\mathrm{d}m_{jj}$ [GeV$^{-1}$]
 LogY=0
 # END PLOT
 
 # BEGIN PLOT /MC_TTBAR_NO_NORM/t_mass
 Title=Mass distribution for reconstructed top
 XLabel=$m_{q\bar{q}b}$ [GeV]
-YLabel=$1/\sigma \, \mathrm{d}\sigma/\mathrm{d}m_{q\bar{q}b}$ [GeV$^{-1}$]
+YLabel=$\mathrm{d}\sigma/\mathrm{d}m_{q\bar{q}b}$ [GeV$^{-1}$]
 LogY=0
 # END PLOT
 
 # BEGIN PLOT /MC_TTBAR_NO_NORM/t_mass_W_cut
 Title=Mass distribution for reconstructed top after $m_W$ cut
 XLabel=$m_{q\bar{q}b}$ [GeV]
-YLabel=$1/\sigma \, \mathrm{d}\sigma/\mathrm{d}m_{q\bar{q}b}$ [GeV$^{-1}$]
+YLabel=$\mathrm{d}\sigma/\mathrm{d}m_{q\bar{q}b}$ [GeV$^{-1}$]
 LogY=0
 # END PLOT
 
 # BEGIN PLOT /MC_TTBAR_NO_NORM/.*_mass
 XLabel=$m$ [GeV]
-YLabel=$1/\sigma \, \mathrm{d}\sigma/\mathrm{d}m$ [GeV$^{-1}$]
+YLabel=$\mathrm{d}\sigma/\mathrm{d}m$ [GeV$^{-1}$]
 # END PLOT
 
 # BEGIN PLOT /MC_TTBAR_NO_NORM/.*_dR
 XLabel=$\Delta R$
-YLabel=$1/\sigma \, \mathrm{d}\sigma/\mathrm{d}\Delta R$
+YLabel=$\mathrm{d}\sigma/\mathrm{d}\Delta R$
 LogY=0
 # END PLOT
 
 # BEGIN PLOT /MC_TTBAR_NO_NORM/.*_deta
 XLabel=$\Delta \eta$
-YLabel=$1/\sigma \, \mathrm{d}\sigma/\mathrm{d}\Delta \eta$
+YLabel=$\mathrm{d}\sigma/\mathrm{d}\Delta \eta$
 LogY=0
 # END PLOT
 
 # BEGIN PLOT /MC_TTBAR_NO_NORM/.*_dphi
 XLabel=$\Delta \phi$
-YLabel=$1/\sigma \, \mathrm{d}\sigma/\mathrm{d}\Delta \phi$
+YLabel=$\mathrm{d}\sigma/\mathrm{d}\Delta \phi$
 LogY=0
 # END PLOT
 
