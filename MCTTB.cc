@@ -101,7 +101,6 @@ namespace Rivet {
             }else{ //parton level
               size_t nb(0);
               Particles jet_content= jet.constituents();
-              MSG_INFO("constituents " << jet_content);
               foreach(Particle part, jet_content){
                   if (part.hasBottom()) nb++;
                 }
