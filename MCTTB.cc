@@ -101,6 +101,7 @@ namespace Rivet {
             }else{ //parton level
               size_t nb(0);
               Particles jet_content= jet.constituents();
+              MSG_INFO("constituents " << jet_content);
               foreach(Particle part, jet_content){
                   if (part.hasBottom()) nb++;
                 }
@@ -276,11 +277,19 @@ namespace Rivet {
     {   }
   };
 
+  class MCTTB_L0_b0_B0_PT30_parton : public MCTTB {
+  public:
+    MCTTB_L0_b0_B0_PT30_parton()
+      :MCTTB("MCTTB_L0_b0_B0_PT30_parton",0,0,0,30,2,1)
+    {   }
+  };
+
   DECLARE_RIVET_PLUGIN(MCTTB_L2_b2_B0_PT30_parton);
   DECLARE_RIVET_PLUGIN(MCTTB_L0_b2_B0_PT30_parton);
   DECLARE_RIVET_PLUGIN(MCTTB_L0_b4_B0_PT30_parton);
   DECLARE_RIVET_PLUGIN(MCTTB_L0_b3_B1_PT30_parton);
   DECLARE_RIVET_PLUGIN(MCTTB_L0_b2_B1_PT30_parton);
+  DECLARE_RIVET_PLUGIN(MCTTB_L0_b0_B0_PT30_parton);
 
 
 
