@@ -101,7 +101,7 @@ namespace Rivet {
             }else{ //parton level
               size_t nb(0);
               Particles jet_content= jet.constituents();
-              MSG_INFO("jet content" << jet_content);
+              //MSG_INFO("jet content" << jet_content);
               foreach(Particle part, jet_content){
                   if (part.hasBottom()) nb++;
                 }
@@ -116,10 +116,10 @@ namespace Rivet {
                 }
             }
         }
-      MSG_INFO("all jets " << alljets.size());
+     /* MSG_INFO("all jets " << alljets.size());
       MSG_INFO("ljet size: " << ljets.size());
       MSG_INFO("bjet size: " << bjets.size());
-      MSG_INFO("Bjet size: " << Bjets.size());
+      MSG_INFO("Bjet size: " << Bjets.size());*/
       if (ljets.size() < num_ljets) vetoEvent;
       if (bjets.size() < num_bjets) vetoEvent;
       if (Bjets.size() < num_Bjets) vetoEvent;
