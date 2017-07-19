@@ -17,7 +17,7 @@ namespace Rivet {
   public:
 
     /// Constructor
-    MCTTB(const string& name="MCTTB", size_t n_ljet=4, size_t n_bjet=2, size_t n_Bjet=0, double ptcut=15.0, size_t bdef=2, size_t cparton=0)
+    MCTTB(const string& name="MCTTB", size_t n_ljet=4, size_t n_bjet=2, size_t n_Bjet=0, double ptcut=15.0, size_t bdef=2, bool cparton=false)
       : Analysis(name), _h_pT_ljet(n_ljet), _h_pT_bjet(n_bjet),_h_pT_Bjet(n_Bjet),_h_Bjet_btags(n_Bjet)
     {  num_Bjets = n_Bjet;
        num_bjets = n_bjet;
@@ -66,9 +66,9 @@ namespace Rivet {
           _h_pT_Bjet[i] = bookHisto1D(pTname, logspace(nbins_pT, m_ptcut, pTmax));
         }
 
-      _h_ljet_multi = bookHisto1D("ljet_multi", 9, num_ljets-0.5, num_ljets + 9 -0.5);
-      _h_bjet_multi = bookHisto1D("bjet_multi", 5, num_bjets-0.5, num_bjets + 5 -0.5);
-      _h_Bjet_multi = bookHisto1D("Bjet_multi", 3, num_Bjets-0.5, num_Bjets + 3 -0.5);
+      _h_ljet_multi = bookHisto1D("ljet_multi", 12, num_ljets-0.5, num_ljets + 12 -0.5);
+      _h_bjet_multi = bookHisto1D("bjet_multi", 7, num_bjets-0.5, num_bjets + 7 -0.5);
+      _h_Bjet_multi = bookHisto1D("Bjet_multi", 4, num_Bjets-0.5, num_Bjets + 4 -0.5);
 
 
     }
@@ -101,6 +101,7 @@ namespace Rivet {
             }else{ //parton level
               size_t nb(0);
               Particles jet_content= jet.constituents();
+              MSG_INFO("jet content" << jet_content);
               foreach(Particle part, jet_content){
                   if (part.hasBottom()) nb++;
                 }
@@ -115,10 +116,10 @@ namespace Rivet {
                 }
             }
         }
-//      MSG_INFO("all jets " << ljets.size());
-//      MSG_INFO("ljet size: " << ljets.size());
-//      MSG_INFO("bjet size: " << bjets.size());
-//      MSG_INFO("Bjet size: " << Bjets.size());
+      MSG_INFO("all jets " << alljets.size());
+      MSG_INFO("ljet size: " << ljets.size());
+      MSG_INFO("bjet size: " << bjets.size());
+      MSG_INFO("Bjet size: " << Bjets.size());
       if (ljets.size() < num_ljets) vetoEvent;
       if (bjets.size() < num_bjets) vetoEvent;
       if (Bjets.size() < num_Bjets) vetoEvent;
@@ -171,7 +172,7 @@ namespace Rivet {
     size_t num_Bjets;
     double m_ptcut;
     size_t m_Bdef;
-    size_t m_parton;
+    bool m_parton;
 
     /// @name Histograms
     // vector histograms: create with required size of jets
@@ -248,42 +249,56 @@ namespace Rivet {
   class MCTTB_L2_b2_B0_PT30_parton : public MCTTB {
   public:
     MCTTB_L2_b2_B0_PT30_parton()
-      :MCTTB("MCTTB_L2_b2_B0_PT30_parton",2,2,0,30,2,1)
+      :MCTTB("MCTTB_L2_b2_B0_PT30_parton",2,2,0,30,2,true)
     {   }
   };
 
   class MCTTB_L0_b2_B0_PT30_parton : public MCTTB {
   public:
     MCTTB_L0_b2_B0_PT30_parton()
-      :MCTTB("MCTTB_L0_b2_B0_PT30_parton",0,2,0,30,2,1)
+      :MCTTB("MCTTB_L0_b2_B0_PT30_parton",0,2,0,30,2,true)
     {   }
   };
 
   class MCTTB_L0_b4_B0_PT30_parton : public MCTTB {
   public:
     MCTTB_L0_b4_B0_PT30_parton()
-      :MCTTB("MCTTB_L0_b4_B0_PT30_parton",0,4,0,30,2,1)
+      :MCTTB("MCTTB_L0_b4_B0_PT30_parton",0,4,0,30,2,true)
     {   }
   };
 
   class MCTTB_L0_b3_B1_PT30_parton : public MCTTB {
   public:
     MCTTB_L0_b3_B1_PT30_parton()
-      :MCTTB("MCTTB_L0_b3_B1_PT30_parton",0,3,1,30,2,1)
+      :MCTTB("MCTTB_L0_b3_B1_PT30_parton",0,3,1,30,2,true)
     {   }
   };
 
   class MCTTB_L0_b2_B1_PT30_parton : public MCTTB {
   public:
     MCTTB_L0_b2_B1_PT30_parton()
-      :MCTTB("MCTTB_L0_b2_B1_PT30_parton",0,2,1,30,2,1)
+      :MCTTB("MCTTB_L0_b2_B1_PT30_parton",0,2,1,30,2,true)
     {   }
   };
 
   class MCTTB_L0_b0_B0_PT30_parton : public MCTTB {
   public:
     MCTTB_L0_b0_B0_PT30_parton()
-      :MCTTB("MCTTB_L0_b0_B0_PT30_parton",0,0,0,30,2,1)
+      :MCTTB("MCTTB_L0_b0_B0_PT30_parton",0,0,0,30,2,true)
+    {   }
+  };
+
+  class MCTTB_L0_b0_B0_PT10_parton : public MCTTB {
+  public:
+    MCTTB_L0_b0_B0_PT10_parton()
+      :MCTTB("MCTTB_L0_b0_B0_PT10_parton",0,0,0,10,2,true)
+    {   }
+  };
+
+  class MCTTB_L0_b0_B0_PT80_parton : public MCTTB {
+  public:
+    MCTTB_L0_b0_B0_PT80_parton()
+      :MCTTB("MCTTB_L0_b0_B0_PT80_parton",0,0,0,80,2,true)
     {   }
   };
 
@@ -293,6 +308,9 @@ namespace Rivet {
   DECLARE_RIVET_PLUGIN(MCTTB_L0_b3_B1_PT30_parton);
   DECLARE_RIVET_PLUGIN(MCTTB_L0_b2_B1_PT30_parton);
   DECLARE_RIVET_PLUGIN(MCTTB_L0_b0_B0_PT30_parton);
+  DECLARE_RIVET_PLUGIN(MCTTB_L0_b0_B0_PT10_parton);
+  DECLARE_RIVET_PLUGIN(MCTTB_L0_b0_B0_PT80_parton);
+
 
 
 
