@@ -158,4 +158,18 @@ namespace Rivet {
     {   }
   };
   DECLARE_RIVET_PLUGIN(BBORD_DR08_PT30_parton);
+
+  class BBORD_DR04_PT10_parton : public BBORD {
+  public:
+    BBORD_DR04_PT10_parton()
+      :BBORD("BBORD_DR04_PT15_parton",0.4,10,true)
+    {   }
+  };
+  DECLARE_RIVET_PLUGIN(BBORD_DR04_PT10_parton);
+
+
+
 }
+
+
+
