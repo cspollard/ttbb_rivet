@@ -76,7 +76,7 @@ namespace Rivet {
             }
           count++;
         }
-      if (bjets.size()>0)  MSG_INFO("bjet size: " << bjets.size());
+      //if (bjets.size()>0)  MSG_INFO("bjet size: " << bjets.size());
       _h_bjet_multi->fill(bjets.size(), weight);
 
 
