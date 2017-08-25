@@ -17,7 +17,7 @@ namespace Rivet {
   public:
 
     /// Constructor
-    MCTTB(const string& name="MCTTB", size_t n_ljet=4, size_t n_bjet=2, size_t n_Bjet=0, double ptcut=15.0, size_t bdef=2, bool cparton=false, double maxeta=5.0)
+    MCTTB(const string& name="MCTTB", size_t n_ljet=4, size_t n_bjet=2, size_t n_Bjet=0, double ptcut=15.0, size_t bdef=2, bool cparton=false, double maxeta=5.0, size_t modus=0)
       : Analysis(name), _h_pT_ljet(n_ljet), _h_pT_bjet(n_bjet),_h_pT_Bjet(n_Bjet),_h_Bjet_btags(n_Bjet)
     {  num_Bjets = n_Bjet;
        num_bjets = n_bjet;
@@ -26,6 +26,7 @@ namespace Rivet {
        m_Bdef=bdef;
        m_parton=cparton;
        m_maxeta= maxeta;
+       m_modus = modus;
     }
 
 
@@ -86,8 +87,18 @@ namespace Rivet {
           vetoEvent;
         }
 
-      Jets bjets,Bjets,ljets;
+      //check for b's in ME
+      size_t numb_me(0);
+      foreach (const GenParticle* p, particles(event.genEvent())) {
+          if ( (p->status()==3) && (abs(p->pdg_id())==5) ) {
+              numb_me++;
+          }
+      }
+      if(numb_me>0 && m_modus==1) vetoEvent;   // do not allow configs with b's in ME
+      if(numb_me==0 && m_modus==2) vetoEvent;  // allow only configs with b in me
 
+
+      Jets bjets,Bjets,ljets;
       foreach (Jet jet, alljets) {
           if (m_parton==0){  //hadron level
               if(jet.bTagged()){
@@ -171,6 +182,7 @@ namespace Rivet {
     size_t num_ljets;
     size_t num_bjets;
     size_t num_Bjets;
+    size_t m_modus;
     double m_ptcut;
     size_t m_Bdef;
     bool m_parton;
@@ -342,5 +354,61 @@ namespace Rivet {
   DECLARE_RIVET_PLUGIN(MCTTB_L0_b0_B0_PT30_parton_eta3);
   DECLARE_RIVET_PLUGIN(MCTTB_L0_b0_B0_PT10_parton_eta3);
   DECLARE_RIVET_PLUGIN(MCTTB_L0_b0_B0_PT80_parton_eta3);
+
+  ///////////////////////////////////////////////
+  // only ME
+  class MCTTB_L0_b0_B0_PT30_parton_me : public MCTTB {
+  public:
+    MCTTB_L0_b0_B0_PT30_parton_me()
+      :MCTTB("MCTTB_L0_b0_B0_PT30_parton_me",0,0,0,30,2,true,5.0,2)
+    {   }
+  };
+
+  class MCTTB_L0_b0_B0_PT10_parton_me : public MCTTB {
+  public:
+    MCTTB_L0_b0_B0_PT10_parton_me()
+      :MCTTB("MCTTB_L0_b0_B0_PT10_parton_me",0,0,0,10,2,true,5.0,2)
+    {   }
+  };
+
+  class MCTTB_L0_b0_B0_PT80_parton_me : public MCTTB {
+  public:
+    MCTTB_L0_b0_B0_PT80_parton_me()
+      :MCTTB("MCTTB_L0_b0_B0_PT80_parton_me",0,0,0,80,2,true,5.0,2)
+    {   }
+  };
+
+
+  DECLARE_RIVET_PLUGIN(MCTTB_L0_b0_B0_PT30_parton_me);
+  DECLARE_RIVET_PLUGIN(MCTTB_L0_b0_B0_PT10_parton_me);
+  DECLARE_RIVET_PLUGIN(MCTTB_L0_b0_B0_PT80_parton_me);
+
+  ///////////////////////////////////////////////
+  // only PS
+  class MCTTB_L0_b0_B0_PT30_parton_ps : public MCTTB {
+  public:
+    MCTTB_L0_b0_B0_PT30_parton_ps()
+      :MCTTB("MCTTB_L0_b0_B0_PT30_parton_ps",0,0,0,30,2,true,5.0,1)
+    {   }
+  };
+
+  class MCTTB_L0_b0_B0_PT10_parton_ps : public MCTTB {
+  public:
+    MCTTB_L0_b0_B0_PT10_parton_ps()
+      :MCTTB("MCTTB_L0_b0_B0_PT10_parton_ps",0,0,0,10,2,true,5.0,1)
+    {   }
+  };
+
+  class MCTTB_L0_b0_B0_PT80_parton_ps : public MCTTB {
+  public:
+    MCTTB_L0_b0_B0_PT80_parton_ps()
+      :MCTTB("MCTTB_L0_b0_B0_PT80_parton_ps",0,0,0,80,2,true,5.0,1)
+    {   }
+  };
+
+
+  DECLARE_RIVET_PLUGIN(MCTTB_L0_b0_B0_PT30_parton_ps);
+  DECLARE_RIVET_PLUGIN(MCTTB_L0_b0_B0_PT10_parton_ps);
+  DECLARE_RIVET_PLUGIN(MCTTB_L0_b0_B0_PT80_parton_ps);
 
 }
