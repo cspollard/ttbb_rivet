@@ -82,10 +82,10 @@ namespace Rivet {
 
       const FastJets& jetpro = apply<FastJets>(event, "Jets");
       const Jets alljets = jetpro.jetsByPt(Cuts::pT>m_ptcut*GeV);
-     /* if (alljets.size() < 2) {
+      if (m_modus==3 && alljets.size() != 2) {
           MSG_DEBUG("Event failed jet multiplicity cut");
           vetoEvent;
-        } */
+        }
 
       //check for b's in ME
       size_t numb_me(0);
@@ -354,6 +354,25 @@ namespace Rivet {
   DECLARE_RIVET_PLUGIN(MCTTB_L0_b0_B0_PT30_parton_eta3);
   DECLARE_RIVET_PLUGIN(MCTTB_L0_b0_B0_PT10_parton_eta3);
   DECLARE_RIVET_PLUGIN(MCTTB_L0_b0_B0_PT80_parton_eta3);
+
+
+
+  // ATLAS inspired
+  class MCTTB_L0_b0_B0_PT20_parton_eta25 : public MCTTB {
+  public:
+    MCTTB_L0_b0_B0_PT20_parton_eta25()
+      :MCTTB("MCTTB_L0_b0_B0_PT20_parton_eta25",0,0,0,20,2,true,2.5)
+    {   }
+  };
+  DECLARE_RIVET_PLUGIN(MCTTB_L0_b0_B0_PT20_parton_eta25);
+
+  class MCTTB_L0_b0_B0_PT20_parton_eta25j2 : public MCTTB {
+  public:
+    MCTTB_L0_b0_B0_PT20_parton_eta25j2()
+      :MCTTB("MCTTB_L0_b0_B0_PT20_parton_eta25j2",0,0,0,20,2,true,2.5,3)
+    {   }
+  };
+  DECLARE_RIVET_PLUGIN(MCTTB_L0_b0_B0_PT20_parton_eta25j2);
 
   ///////////////////////////////////////////////
   // only ME
