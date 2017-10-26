@@ -82,7 +82,7 @@ namespace Rivet {
 
       const FastJets& jetpro = apply<FastJets>(event, "Jets");
       const Jets alljets = jetpro.jetsByPt(Cuts::pT>m_ptcut*GeV);
-      if (m_modus==3 && alljets.size() != 2) {
+      if (m_modus==3 && alljets.size() != 4) {
           MSG_DEBUG("Event failed jet multiplicity cut");
           vetoEvent;
         }
