@@ -188,7 +188,7 @@ namespace Rivet {
       if ((b1 + b2).mass() < 100*GeV)
         return;
 
-      h_mbbgt100_ht->fill(deltaR(b1, b2), weight);
+      h_mbbgt100_ht->fill(ht, weight);
       h_mbbgt100_mbb->fill((b1 + b2).mass(), weight);
       h_mbbgt100_dphibb->fill(deltaPhi(b1, b2), weight);
       h_mbbgt100_drbb->fill(deltaR(b1, b2), weight);
