@@ -9,6 +9,11 @@
 namespace Rivet {
 
 
+  string dsdx(const string& x, const string& xunit) {
+    return "\\ensuremath{\\frac{d\\sigma}{d" + x + "} \\frac{{pb}}{" + xunit + "}}";
+  }
+
+
   class MCTTBB2 : public Analysis {
   public:
 
@@ -18,43 +23,62 @@ namespace Rivet {
       FinalPartons fps(Cuts::abseta < 5 && Cuts::abspid != 6);
       declare(PartonicTops(), "Tops");
 
+      string pt = "\\ensuremath{p_\\mathrm{T}}";
+      string eta = "\\ensuremath{\\eta}";
+      string dphibb = "\\ensuremath{\\Delta\\phi(b,b)}";
+      string drbb = "\\ensuremath{\\Delta R(b,b)}";
+      string ptbb = "\\ensuremath{p_{\\mathrm{T}, bb}}";
+      string mbb = "\\ensuremath{m_{bb}}";
+      string ht = "\\ensuremath{h_\\mathrm{T}}";
+
       declare(FastJets(fps, FastJets::ANTIKT, 0.4), "Jets");
 
-      h_nlj = bookHisto1D("h_nlj", 10, 0, 10);
-      h_nbj = bookHisto1D("h_nbj", 5, 0, 5);
-      h_nBj = bookHisto1D("h_nBj", 5, 0, 5);
+      h_nlj = bookHisto1D("h_nlj", 10, 0, 10, "", "light-jet multiplicity", dsdx("n", "1"));
+      h_nbj = bookHisto1D("h_nbj", 5, 0, 5, "", "$b$-jet mulitplicity", dsdx("n", "1"));
+      h_nBj = bookHisto1D("h_nBj", 5, 0, 5, "", "$bb$-jet multiplicity", dsdx("n", "1"));
 
-      h_ptl1 = bookHisto1D("h_ptl1", 50, 0, 500*GeV);
-      h_ptl2 = bookHisto1D("h_ptl2", 50, 0, 500*GeV);
-      h_ptb1 = bookHisto1D("h_ptb1", 50, 0, 500*GeV);
-      h_ptb2 = bookHisto1D("h_ptb2", 50, 0, 500*GeV);
-      h_ptB1 = bookHisto1D("h_ptB1", 50, 0, 500*GeV);
-      h_ptB2 = bookHisto1D("h_ptB2", 50, 0, 500*GeV);
+      h_ptl1 = bookHisto1D("h_ptl1", 50, 0, 500*GeV, "", "leading light-jet " + pt + " [GeV]", dsdx(pt, "\\mathrm{GeV}"));
 
-      h_etal1 = bookHisto1D("h_etal1", 50, -2.5, 2.5);
-      h_etal2 = bookHisto1D("h_etal2", 50, -2.5, 2.5);
-      h_etab1 = bookHisto1D("h_etab1", 50, -2.5, 2.5);
-      h_etab2 = bookHisto1D("h_etab2", 50, -2.5, 2.5);
-      h_etaB1 = bookHisto1D("h_etaB1", 50, -2.5, 2.5);
-      h_etaB2 = bookHisto1D("h_etaB2", 50, -2.5, 2.5);
+      h_ptl2 = bookHisto1D("h_ptl2", 50, 0, 500*GeV, "", "subleading light-jet " + pt + " [GeV]", dsdx(pt, "\\mathrm{GeV}"));
 
-      h_mbb = bookHisto1D("h_mbb", 50, 0, 500*GeV);
-      h_dphibb = bookHisto1D("h_dphibb", 50, -4, 4);
-      h_drbb = bookHisto1D("h_drbb", 50, -5, 5);
-      h_ptbb = bookHisto1D("h_ptbb", 50, 0, 500*GeV);
-      h_ht = bookHisto1D("h_ht", 50, 0, 1000*GeV);
+      h_ptb1 = bookHisto1D("h_ptb1", 50, 0, 500*GeV, "", "leading $b$-jet " + pt + " [GeV]", dsdx(pt, "\\mathrm{GeV}"));
 
-      h_mbb_mbbgt100 = bookHisto1D("h_mbb_mbbgt100", 50, 0, 500*GeV);
-      h_dphibb_mbbgt100 = bookHisto1D("h_dphibb_mbbgt100", 50, -4, 4);
-      h_drbb_mbbgt100 = bookHisto1D("h_drbb_mbbgt100", 50, -5, 5);
-      h_ptbb_mbbgt100 = bookHisto1D("h_ptbb_mbbgt100", 50, 0, 500*GeV);
-      h_ht_mbbgt100 = bookHisto1D("h_ht_mbbgt100", 50, 0, 1000*GeV);
+      h_ptb2 = bookHisto1D("h_ptb2", 50, 0, 500*GeV, "", "subleading $b$-jet " + pt + " [GeV]", dsdx(pt, "\\mathrm{GeV}"));
+
+      h_ptB1 = bookHisto1D("h_ptB1", 50, 0, 500*GeV, "", "leading $bb$-jet " + pt + " [GeV]", dsdx(pt, "\\mathrm{GeV}"));
+
+      h_ptB2 = bookHisto1D("h_ptB2", 50, 0, 500*GeV, "", "subleading $bb$-jet " + pt + " [GeV]", dsdx(pt, "\\mathrm{GeV}"));
+
+
+      h_etal1 = bookHisto1D("h_etal1", 30, -3, 3, "", "leading light-jet " + eta, dsdx(eta, "\\mathrm{GeV}"));
+
+      h_etal2 = bookHisto1D("h_etal2", 30, -3, 3, "", "subleading light-jet " + eta, dsdx(eta, "\\mathrm{GeV}"));
+
+      h_etab1 = bookHisto1D("h_etab1", 30, -3, 3, "", "leading $b$-jet " + eta, dsdx(eta, "\\mathrm{GeV}"));
+
+      h_etab2 = bookHisto1D("h_etab2", 30, -3, 3, "", "subleading $b$-jet " + eta, dsdx(eta, "\\mathrm{GeV}"));
+
+      h_etaB1 = bookHisto1D("h_etaB1", 30, -3, 3, "", "leading $bb$-jet " + eta, dsdx(eta, "\\mathrm{GeV}"));
+
+      h_etaB2 = bookHisto1D("h_etaB2", 30, -3, 3, "", "subleading $bb$-jet " + eta, dsdx(eta, "\\mathrm{GeV}"));
+
+      h_mbb = bookHisto1D("h_mbb", 50, 0, 500*GeV, "", mbb + " [GeV]", dsdx(mbb, "\\mathrm{GeV}"));
+      h_dphibb = bookHisto1D("h_dphibb", 50, 0, 4, "", dphibb, dsdx(dphibb, "1"));
+      h_drbb = bookHisto1D("h_drbb", 50, 0, 5, "", drbb, dsdx(drbb, "1"));
+      h_ptbb = bookHisto1D("h_ptbb", 50, 0, 500*GeV, "", ptbb + " [GeV]", dsdx(ptbb, "\\mathrm{GeV}"));
+      h_ht = bookHisto1D("h_ht", 50, 0, 2000*GeV, "", ht + " [GeV]", dsdx(ht, "\\mathrm{GeV}"));
+
+      h_mbbgt100_mbb = bookHisto1D("h_mbbgt100_mbb", 50, 0, 500*GeV, "", mbb + " [GeV]", dsdx(mbb, "\\mathrm{GeV}"));
+      h_mbbgt100_dphibb = bookHisto1D("h_mbbgt100_dphibb", 50, 0, 4, "", dphibb, dsdx(dphibb, "1"));
+      h_mbbgt100_drbb = bookHisto1D("h_mbbgt100_drbb", 50, 0, 5, "", drbb, dsdx(drbb, "1"));
+      h_mbbgt100_ptbb = bookHisto1D("h_mbbgt100_ptbb", 50, 0, 500*GeV, "", ptbb + " [GeV]", dsdx(ptbb, "\\mathrm{GeV}"));
+      h_mbbgt100_ht = bookHisto1D("h_mbbgt100_ht", 50, 0, 2000*GeV, "", ht + " [GeV]", dsdx(ht, "\\mathrm{GeV}"));
 
       hists =
         { h_nlj, h_nbj, h_nBj, h_ptl1, h_ptl2, h_ptb1, h_ptb2, h_ptB1, h_ptB2
         , h_etal1, h_etal2, h_etab1, h_etab2, h_etaB1, h_etaB2, h_mbb, h_dphibb
-        , h_drbb, h_ptbb, h_ht, h_mbb_mbbgt100, h_dphibb_mbbgt100
-        , h_drbb_mbbgt100, h_ptbb_mbbgt100, h_ht_mbbgt100
+        , h_drbb, h_ptbb, h_ht, h_mbbgt100_mbb, h_mbbgt100_dphibb
+        , h_mbbgt100_drbb, h_mbbgt100_ptbb, h_mbbgt100_ht
         };
     }
 
@@ -159,14 +183,16 @@ namespace Rivet {
       h_mbb->fill((b1 + b2).mass(), weight);
       h_dphibb->fill(deltaPhi(b1, b2), weight);
       h_drbb->fill(deltaR(b1, b2), weight);
+      h_ptbb->fill((b1 + b2).pt(), weight);
 
       if ((b1 + b2).mass() < 100*GeV)
         return;
 
-      h_ht_mbbgt100->fill(deltaR(b1, b2), weight);
-      h_mbb_mbbgt100->fill((b1 + b2).mass(), weight);
-      h_dphibb_mbbgt100->fill(deltaPhi(b1, b2), weight);
-      h_drbb_mbbgt100->fill(deltaR(b1, b2), weight);
+      h_mbbgt100_ht->fill(deltaR(b1, b2), weight);
+      h_mbbgt100_mbb->fill((b1 + b2).mass(), weight);
+      h_mbbgt100_dphibb->fill(deltaPhi(b1, b2), weight);
+      h_mbbgt100_drbb->fill(deltaR(b1, b2), weight);
+      h_mbbgt100_ptbb->fill((b1 + b2).pt(), weight);
 
       return;
     }
@@ -203,11 +229,11 @@ namespace Rivet {
       Histo1DPtr h_ptbb;
       Histo1DPtr h_ht;
 
-      Histo1DPtr h_mbb_mbbgt100;
-      Histo1DPtr h_dphibb_mbbgt100;
-      Histo1DPtr h_drbb_mbbgt100;
-      Histo1DPtr h_ptbb_mbbgt100;
-      Histo1DPtr h_ht_mbbgt100;
+      Histo1DPtr h_mbbgt100_mbb;
+      Histo1DPtr h_mbbgt100_dphibb;
+      Histo1DPtr h_mbbgt100_drbb;
+      Histo1DPtr h_mbbgt100_ptbb;
+      Histo1DPtr h_mbbgt100_ht;
     };
 
     DECLARE_RIVET_PLUGIN(MCTTBB2);
