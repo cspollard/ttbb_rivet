@@ -113,9 +113,9 @@ namespace Rivet {
 
 
       // fill the jet multiplicity histograms
-      h_nlj->fill(ljs.size());
-      h_nbj->fill(bjs.size());
-      h_nBj->fill(Bjs.size());
+      h_nlj->fill(ljs.size(), weight);
+      h_nbj->fill(bjs.size(), weight);
+      h_nBj->fill(Bjs.size(), weight);
 
       if (ljs.size() >= 1) {
         h_ptl1->fill(ljs[0].pt(), weight);
