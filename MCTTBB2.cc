@@ -89,7 +89,7 @@ namespace Rivet {
 
       const Jets& jets =
         apply<FastJets>(event, "Jets").jetsByPt(
-          (Cuts::mass > 150*GeV || Cuts::pT > 25*GeV) && Cuts::abseta < 2.5);
+          Cuts::pT > 25*GeV && Cuts::abseta < 2.5);
       const Particles& tquarks = apply<PartonicTops>(event, "Tops").tops();
 
       // find the light, b, and B jets by checking the number of b-quark
