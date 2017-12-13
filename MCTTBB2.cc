@@ -25,7 +25,7 @@ namespace Rivet {
 
       string pt = "\\ensuremath{p_\\mathrm{T}}";
       string eta = "\\ensuremath{\\eta}";
-      string dphibb = "\\ensuremath{\\Delta\\phi(b,b)}";
+      string dphibb = "\\ensuremath{|\\Delta\\phi(b,b)|}";
       string drbb = "\\ensuremath{\\Delta R(b,b)}";
       string ptbb = "\\ensuremath{p_{\\mathrm{T}, bb}}";
       string mbb = "\\ensuremath{m_{bb}}";
@@ -89,7 +89,7 @@ namespace Rivet {
 
       const Jets& jets =
         apply<FastJets>(event, "Jets").jetsByPt(
-          (Cuts::mass > 150*GeV || Cuts::pT > 25*GeV) && Cuts::abseta < 2.5);
+          Cuts::pT > 25*GeV && Cuts::abseta < 2.5);
       const Particles& tquarks = apply<PartonicTops>(event, "Tops").tops();
 
       // find the light, b, and B jets by checking the number of b-quark
@@ -181,7 +181,7 @@ namespace Rivet {
         return;
 
       h_mbb->fill((b1 + b2).mass(), weight);
-      h_dphibb->fill(deltaPhi(b1, b2), weight);
+      h_dphibb->fill(abs(deltaPhi(b1, b2)), weight);
       h_drbb->fill(deltaR(b1, b2), weight);
       h_ptbb->fill((b1 + b2).pt(), weight);
 
@@ -190,7 +190,7 @@ namespace Rivet {
 
       h_mbbgt100_ht->fill(ht, weight);
       h_mbbgt100_mbb->fill((b1 + b2).mass(), weight);
-      h_mbbgt100_dphibb->fill(deltaPhi(b1, b2), weight);
+      h_mbbgt100_dphibb->fill(abs(deltaPhi(b1, b2)), weight);
       h_mbbgt100_drbb->fill(deltaR(b1, b2), weight);
       h_mbbgt100_ptbb->fill((b1 + b2).pt(), weight);
 
@@ -199,8 +199,14 @@ namespace Rivet {
 
 
       void finalize() {
-        for (Histo1DPtr& h: hists)
+        for (Histo1DPtr& h: hists) {
           scale(h, crossSection()/picobarn/sumOfWeights());
+          Histo1DPtr hnorm = make_shared<YODA::Histo1D>(*h);
+          hnorm->normalize();
+          hnorm->setPath(h->path() + "_norm");
+          hnorm->setAnnotation("YLabel", "\\ensuremath{\\frac{1}{\\sigma}}" + hnorm->annotation("YLabel"));
+          addAnalysisObject(hnorm);
+        }
       }
 
     private:
