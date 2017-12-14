@@ -20,8 +20,8 @@ namespace Rivet {
     DEFAULT_RIVET_ANALYSIS_CTOR(MCTTBB2);
 
     void init() {
-      FinalPartons fps(Cuts::abseta < 5 && Cuts::abspid != 6);
-      declare(PartonicTops(), "Tops");
+      FinalState fps(Cuts::abseta < 5 && Cuts::abspid != 6);
+      declare(FinalState(Cuts::abspid==6), "Tops");
 
       string pt = "\\ensuremath{p_\\mathrm{T}}";
       string eta = "\\ensuremath{\\eta}";
@@ -90,7 +90,7 @@ namespace Rivet {
       const Jets& jets =
         apply<FastJets>(event, "Jets").jetsByPt(
           Cuts::pT > 25*GeV && Cuts::abseta < 2.5);
-      const Particles& tquarks = apply<PartonicTops>(event, "Tops").tops();
+      const Particles& tquarks = apply<FinalState>(event, "Tops").particles();
 
       // find the light, b, and B jets by checking the number of b-quark
       // constituents in the jet.
