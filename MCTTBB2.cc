@@ -201,11 +201,13 @@ namespace Rivet {
       void finalize() {
         for (Histo1DPtr& h: hists) {
           scale(h, crossSection()/picobarn/sumOfWeights());
+        /*
           Histo1DPtr hnorm = make_shared<YODA::Histo1D>(*h);
           hnorm->normalize();
           hnorm->setPath(h->path() + "_norm");
           hnorm->setAnnotation("YLabel", "\\ensuremath{\\frac{1}{\\sigma}}" + hnorm->annotation("YLabel"));
           addAnalysisObject(hnorm);
+        */     
         }
       }
 
