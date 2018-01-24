@@ -9,10 +9,6 @@
 namespace Rivet {
 
 
-  string dsdx(const string& x, const string& xunit) {
-    return "\\ensuremath{\\frac{d\\sigma}{d" + x + "} \\frac{{pb}}{" + xunit + "}}";
-  }
-
   string spt = "\\ensuremath{p_\\mathrm{T}}";
   string seta = "\\ensuremath{\\eta}";
   string sdphibb = "\\ensuremath{|\\Delta\\phi(b,b)|}";
@@ -22,10 +18,13 @@ namespace Rivet {
   string sht = "\\ensuremath{h_\\mathrm{T}}";
 
 
-  Histo1D histo1D(const string& name, size_t nb, double low, double high, const string& title, const string& xlab, const string& ylab) {
-    Histo1D h = Histo1D(nb, low, high, name, title);
-    h.setAnnotation("XLabel", xlab);
-    h.setAnnotation("YLabel", ylab);
+  Histo1DPtr histo1D(
+        const string& name, size_t nb, double low, double high
+      , const string& title, const string& xlab, const string& ylab) {
+
+    Histo1DPtr h = make_shared<Histo1D>(nb, low, high, name, title);
+    h->setAnnotation("XLabel", xlab);
+    h->setAnnotation("YLabel", ylab);
     return h;
   }
 
@@ -68,49 +67,49 @@ namespace Rivet {
     }
 
     void fill(double weight, const Jets& jls, const Jets& jbs, const Jets& j0bs, const Jets& j1bs, double ht_other) {
-        h_njl.fill(jls.size(), weight);
-        h_njb.fill(j0bs.size()+j1bs.size(), weight);
-        h_nj0b.fill(j0bs.size(), weight);
-        h_nj1b.fill(j1bs.size(), weight);
+        h_njl->fill(jls.size(), weight);
+        h_njb->fill(j0bs.size()+j1bs.size(), weight);
+        h_nj0b->fill(j0bs.size(), weight);
+        h_nj1b->fill(j1bs.size(), weight);
 
         if (jls.size() >= 1) {
-          h_jl1pt.fill(jls[0].pt(), weight);
-          h_jl1eta.fill(jls[0].eta(), weight);
+          h_jl1pt->fill(jls[0].pt(), weight);
+          h_jl1eta->fill(jls[0].eta(), weight);
         }
 
         if (jls.size() >= 2) {
-          h_jl2pt.fill(jls[1].pt(), weight);
-          h_jl2eta.fill(jls[1].eta(), weight);
+          h_jl2pt->fill(jls[1].pt(), weight);
+          h_jl2eta->fill(jls[1].eta(), weight);
         }
 
         if (jbs.size() >= 1) {
-          h_jb1pt.fill(jbs[0].pt(), weight);
-          h_jb1eta.fill(jbs[0].eta(), weight);
+          h_jb1pt->fill(jbs[0].pt(), weight);
+          h_jb1eta->fill(jbs[0].eta(), weight);
         }
 
         if (jbs.size() >= 2) {
-          h_jb2pt.fill(jbs[1].pt(), weight);
-          h_jb2eta.fill(jbs[1].eta(), weight);
+          h_jb2pt->fill(jbs[1].pt(), weight);
+          h_jb2eta->fill(jbs[1].eta(), weight);
         }
 
         if (j0bs.size() >= 1) {
-          h_j0b1pt.fill(j0bs[0].pt(), weight);
-          h_j0b1eta.fill(j0bs[0].eta(), weight);
+          h_j0b1pt->fill(j0bs[0].pt(), weight);
+          h_j0b1eta->fill(j0bs[0].eta(), weight);
         }
 
         if (j0bs.size() >= 2) {
-          h_j0b2pt.fill(j0bs[1].pt(), weight);
-          h_j0b2eta.fill(j0bs[1].eta(), weight);
+          h_j0b2pt->fill(j0bs[1].pt(), weight);
+          h_j0b2eta->fill(j0bs[1].eta(), weight);
         }
 
         if (j1bs.size() >= 1) {
-          h_j1b1pt.fill(j1bs[0].pt(), weight);
-          h_j1b1eta.fill(j1bs[0].eta(), weight);
+          h_j1b1pt->fill(j1bs[0].pt(), weight);
+          h_j1b1eta->fill(j1bs[0].eta(), weight);
         }
 
         if (j1bs.size() >= 2) {
-          h_j1b2pt.fill(j1bs[1].pt(), weight);
-          h_j1b2eta.fill(j1bs[1].eta(), weight);
+          h_j1b2pt->fill(j1bs[1].pt(), weight);
+          h_j1b2eta->fill(j1bs[1].eta(), weight);
         }
 
         // we define the ht as the scalar sum of all the light, b, and B jet pts
@@ -122,7 +121,7 @@ namespace Rivet {
         for (const Jet& bj: jbs)
           ht += bj.pt();
 
-        h_ht.fill(ht, weight);
+        h_ht->fill(ht, weight);
 
         // find the two leading "b-jets" in the event, where "b-jet" here means
         // the two leading jets with at least one b-quark constituent, with jets
@@ -140,14 +139,16 @@ namespace Rivet {
         } else
           return;
 
-        h_mbb.fill((b1 + b2).mass(), weight);
-        h_dphibb.fill(abs(deltaPhi(b1, b2)), weight);
-        h_drbb.fill(deltaR(b1, b2), weight);
-        h_ptbb.fill((b1 + b2).pt(), weight);
+        h_mbb->fill((b1 + b2).mass(), weight);
+        h_dphibb->fill(abs(deltaPhi(b1, b2)), weight);
+        h_drbb->fill(deltaR(b1, b2), weight);
+        h_ptbb->fill((b1 + b2).pt(), weight);
 
       };
 
-      const vector<Histo1D> histograms() const {
+      // this has to be a vector<Histo1DPtr> rather than vector<Histo1D> because
+      // the Histo1D copy constructor loses all annotations?!?!?!?
+      vector<Histo1DPtr> histograms() {
         return
           { h_njl, h_njb, h_nj0b, h_nj1b
           , h_jl1pt, h_jl2pt, h_jb1pt, h_jb2pt
@@ -159,8 +160,12 @@ namespace Rivet {
       }
 
     private:
+      string dsdx(const string& x, const string& xunit) {
+        return "\\ensuremath{\\frac{d\\sigma}{d" + x + "} \\frac{{pb}}{" + xunit + "}}";
+      }
 
-      Histo1D
+
+      Histo1DPtr
           h_njl, h_njb, h_nj0b, h_nj1b
         , h_jl1pt, h_jl2pt, h_jb1pt, h_jb2pt
         , h_j0b1pt, h_j0b2pt, h_j1b1pt, h_j1b2pt
@@ -285,9 +290,9 @@ namespace Rivet {
           vector<TTBBHists> hists =
             {h_inclusive, h_zerob, h_atleastoneb, h_onej0b, h_onej1b, h_twoj1b, h_mbbgt100};
 
-          for (const TTBBHists& hist: hists) {
-            for (const Histo1D& h: hist.histograms()) {
-              Histo1DPtr ph = make_shared<Histo1D>(h);
+          for (TTBBHists& hist: hists) {
+            for (Histo1DPtr h: hist.histograms()) {
+              Histo1DPtr ph = make_shared<Histo1D>(*h);
               ph->setPath(histoDir() + ph->path());
               scale(ph, crossSection()/picobarn/sumOfWeights());
               addAnalysisObject(ph);

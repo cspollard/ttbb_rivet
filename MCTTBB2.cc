@@ -9,11 +9,6 @@
 namespace Rivet {
 
 
-  string dsdx(const string& x, const string& xunit) {
-    return "\\ensuremath{\\frac{d\\sigma}{d" + x + "} \\frac{{pb}}{" + xunit + "}}";
-  }
-
-
   class MCTTBB2 : public Analysis {
   public:
 
@@ -207,11 +202,17 @@ namespace Rivet {
           hnorm->setPath(h->path() + "_norm");
           hnorm->setAnnotation("YLabel", "\\ensuremath{\\frac{1}{\\sigma}}" + hnorm->annotation("YLabel"));
           addAnalysisObject(hnorm);
-        */     
+        */
         }
       }
 
     private:
+
+      string dsdx(const string& x, const string& xunit) {
+        return "\\ensuremath{\\frac{d\\sigma}{d" + x + "} \\frac{{pb}}{" + xunit + "}}";
+      }
+
+
       vector<Histo1DPtr> hists;
       Histo1DPtr h_nlj;
       Histo1DPtr h_nbj;
