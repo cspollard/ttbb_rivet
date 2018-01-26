@@ -11,6 +11,9 @@ namespace Rivet {
 
   string spt = "\\ensuremath{p_\\mathrm{T}}";
   string seta = "\\ensuremath{\\eta}";
+  string sdphitb = "\\ensuremath{|\\Delta\\phi(t,b)|}";
+  string sdetatb = "\\ensuremath{|\\Delta\\eta(t,b)|}";
+  string sdrtb = "\\ensuremath{|\\Delta R(t,b)|}";
   string sdphibb = "\\ensuremath{|\\Delta\\phi(b,b)|}";
   string sdrbb = "\\ensuremath{\\Delta R(b,b)}";
   string sptbb = "\\ensuremath{p_{\\mathrm{T}, bb}}";
@@ -58,6 +61,10 @@ namespace Rivet {
       h_j1b1eta = histo1D("h_" + prefix + "_j1b1eta", 30, -3, 3, "", "leading $b1$-jet " + seta, dsdx(seta, "\\mathrm{GeV}"));
       h_j1b2eta = histo1D("h_" + prefix + "_j1b2eta", 30, -3, 3, "", "subleading $b1$-jet " + seta, dsdx(seta, "\\mathrm{GeV}"));
 
+      h_dphitb = histo1D("h_" + prefix + "_dphitb", 50, 0, 4, "", sdphitb, dsdx(sdphitb, "\\mathrm{1}"));
+      h_detatb = histo1D("h_" + prefix + "_detatb", 50, 0, 4, "", sdetatb, dsdx(sdetatb, "\\mathrm{1}"));
+      h_drtb = histo1D("h_" + prefix + "_drtb", 50, 0, 4, "", sdrtb, dsdx(sdrtb, "\\mathrm{1}"));
+
       h_mbb = histo1D("h_" + prefix + "_mbb", 50, 0, 500*GeV, "", smbb + " [GeV]", dsdx(smbb, "\\mathrm{GeV}"));
       h_dphibb = histo1D("h_" + prefix + "_dphibb", 50, 0, 4, "", sdphibb, dsdx(sdphibb, "1"));
       h_drbb = histo1D("h_" + prefix + "_drbb", 50, 0, 5, "", sdrbb, dsdx(sdrbb, "1"));
@@ -66,7 +73,7 @@ namespace Rivet {
 
     }
 
-    void fill(double weight, const Jets& jls, const Jets& jbs, const Jets& j0bs, const Jets& j1bs, double ht_other) {
+    void fill(double weight, const Jets& jls, const Jets& jbs, const Jets& j0bs, const Jets& j1bs, const Particles& tops) {
         h_njl->fill(jls.size(), weight);
         h_njb->fill(j0bs.size()+j1bs.size(), weight);
         h_nj0b->fill(j0bs.size(), weight);
@@ -114,7 +121,10 @@ namespace Rivet {
 
         // we define the ht as the scalar sum of all the light, b, and B jet pts
         // plus the masses of all top quarks in the event.
-        double ht = ht_other;
+        double ht = 0.0;
+        for (const Particle& t: tops)
+          ht += t.mass();
+
         for (const Jet& lj: jls)
           ht += lj.pt();
 
@@ -139,6 +149,28 @@ namespace Rivet {
         } else
           return;
 
+        // find the closest (in dR) top to a jet with at least one b
+        // and store relative angles
+        double mindr = -1;
+        double mindrdeta = -1;
+        double mindrdphi = -1;
+        for (const Jet& jb: jbs) {
+          for (const Particle& t: tops) {
+            double dr = deltaR(jb, t);
+            if (mindr < 1 || dr < mindr) {
+              mindr = dr;
+              mindrdphi = abs(deltaPhi(jb, t));
+              mindrdeta = abs(deltaEta(jb, t));
+            }
+          }
+        }
+
+        if (mindr >= 0) {
+          h_drtb->fill(mindr, weight);
+          h_dphitb->fill(mindrdphi, weight);
+          h_detatb->fill(mindrdeta, weight);
+        }
+
         h_mbb->fill((b1 + b2).mass(), weight);
         h_dphibb->fill(abs(deltaPhi(b1, b2)), weight);
         h_drbb->fill(deltaR(b1, b2), weight);
@@ -155,6 +187,7 @@ namespace Rivet {
           , h_j0b1pt, h_j0b2pt, h_j1b1pt, h_j1b2pt
           , h_jl1eta, h_jl2eta, h_jb1eta, h_jb2eta
           , h_j0b1eta, h_j0b2eta, h_j1b1eta, h_j1b2eta
+          , h_dphitb, h_detatb, h_drtb
           , h_mbb, h_dphibb, h_drbb, h_ptbb, h_ht
           };
       }
@@ -171,6 +204,7 @@ namespace Rivet {
         , h_j0b1pt, h_j0b2pt, h_j1b1pt, h_j1b2pt
         , h_jl1eta, h_jl2eta, h_jb1eta, h_jb2eta
         , h_j0b1eta, h_j0b2eta, h_j1b1eta, h_j1b2eta
+        , h_dphitb, h_detatb, h_drtb
         , h_mbb, h_dphibb, h_drbb, h_ptbb, h_ht;
 
     };
@@ -241,27 +275,21 @@ namespace Rivet {
           }
         }
 
-        // we define the ht as the scalar sum of all the light, b, and B jet pts
-        // plus the masses of all top quarks in the event.
-        double ht = 0;
-        for (const Particle& tq: tquarks)
-          ht += tq.mass();
-
         // inclusive selection
-        h_inclusive.fill(weight, jls, jbs, j0bs, j1bs, ht);
+        h_inclusive.fill(weight, jls, jbs, j0bs, j1bs, tquarks);
 
         // no accepted jets with b-quarks inside
-        if (jbs.size() == 0) h_zerob.fill(weight, jls, jbs, j0bs, j1bs, ht);
+        if (jbs.size() == 0) h_zerob.fill(weight, jls, jbs, j0bs, j1bs, tquarks);
         // at least one jet with b-quarks inside
-        else h_atleastoneb.fill(weight, jls, jbs, j0bs, j1bs, ht);
+        else h_atleastoneb.fill(weight, jls, jbs, j0bs, j1bs, tquarks);
 
         // exactly one jet with an imbalance of b and anti-b
-        if (j1bs.size() == 1) h_onej1b.fill(weight, jls, jbs, j0bs, j1bs, ht);
+        if (j1bs.size() == 1) h_onej1b.fill(weight, jls, jbs, j0bs, j1bs, tquarks);
         // exactly two jets with an imbalance of b and anti-b
-        else if (j1bs.size() == 2) h_twoj1b.fill(weight, jls, jbs, j0bs, j1bs, ht);
+        else if (j1bs.size() == 2) h_twoj1b.fill(weight, jls, jbs, j0bs, j1bs, tquarks);
 
         // exactly one jet with balance of b and anti-b
-        if (j0bs.size() == 1) h_onej0b.fill(weight, jls, jbs, j0bs, j1bs, ht);
+        if (j0bs.size() == 1) h_onej0b.fill(weight, jls, jbs, j0bs, j1bs, tquarks);
 
         // find the two leading "b-jets" in the event, where "b-jet" here means
         // the two leading jets with at least one b-quark constituent, with jets
@@ -279,7 +307,7 @@ namespace Rivet {
         } else
           return;
 
-        if ((b1+b2).mass() > 100*GeV) h_mbbgt100.fill(weight, jls, jbs, j0bs, j1bs, ht);
+        if ((b1+b2).mass() > 100*GeV) h_mbbgt100.fill(weight, jls, jbs, j0bs, j1bs, tquarks);
 
 
         return;
