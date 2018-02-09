@@ -227,6 +227,9 @@ namespace Rivet {
       h_atleastoneb = TTBBHists("atleastoneb");
       h_onej1b = TTBBHists("onej1b");
       h_twoj1b = TTBBHists("twoj1b");
+      h_atleasttwoj1b = TTBBHists("atleasttwoj1b");
+      h_threej1b = TTBBHists("threej1b");
+      h_fourj1b = TTBBHists("fourj1b");
       h_onej0b = TTBBHists("onej0b");
       h_mbbgt100 = TTBBHists("mbbgt100");
 
@@ -287,6 +290,13 @@ namespace Rivet {
         if (j1bs.size() == 1) h_onej1b.fill(weight, jls, jbs, j0bs, j1bs, tquarks);
         // exactly two jets with an imbalance of b and anti-b
         else if (j1bs.size() == 2) h_twoj1b.fill(weight, jls, jbs, j0bs, j1bs, tquarks);
+        // exactly three jets with an imbalance of b and anti-b
+        else if (j1bs.size() == 3) h_threej1b.fill(weight, jls, jbs, j0bs, j1bs, tquarks);
+        // exactly four jets with an imbalance of b and anti-b
+        else if (j1bs.size() == 4) h_fourj1b.fill(weight, jls, jbs, j0bs, j1bs, tquarks);
+
+        // at least two jets with an imbalance of b and anti-b
+        if (j1bs.size() >= 2) h_atleasttwoj1b.fill(weight, jls, jbs, j0bs, j1bs, tquarks);
 
         // exactly one jet with balance of b and anti-b
         if (j0bs.size() == 1) h_onej0b.fill(weight, jls, jbs, j0bs, j1bs, tquarks);
@@ -316,7 +326,10 @@ namespace Rivet {
 
         void finalize() {
           vector<TTBBHists> hists =
-            {h_inclusive, h_zerob, h_atleastoneb, h_onej0b, h_onej1b, h_twoj1b, h_mbbgt100};
+            { h_inclusive, h_zerob, h_atleastoneb, h_onej0b
+            , h_onej1b, h_twoj1b, h_atleasttwoj1b, h_threej1b
+            , h_fourj1b, h_mbbgt100
+            };
 
           for (TTBBHists& hist: hists) {
             for (Histo1DPtr h: hist.histograms()) {
@@ -329,7 +342,7 @@ namespace Rivet {
       }
 
     private:
-      TTBBHists h_inclusive, h_zerob, h_atleastoneb, h_onej1b, h_twoj1b, h_onej0b, h_mbbgt100;
+      TTBBHists h_inclusive, h_zerob, h_atleastoneb, h_onej1b, h_twoj1b, h_atleasttwoj1b, h_threej1b, h_fourj1b, h_onej0b, h_mbbgt100;
 
     };
 
