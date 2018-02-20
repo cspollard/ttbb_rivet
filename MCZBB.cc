@@ -9,35 +9,37 @@
 namespace Rivet {
 
 
-  string spt = "\\ensuremath{p_\\mathrm{T}}";
-  string seta = "\\ensuremath{\\eta}";
-  string sdphizb = "\\ensuremath{|\\Delta\\phi(Z,b)|}";
-  string sdetazb = "\\ensuremath{|\\Delta\\eta(Z,b)|}";
-  string sdrzb = "\\ensuremath{|\\Delta R(Z,b)|}";
-  string sdphibb = "\\ensuremath{|\\Delta\\phi(b,b)|}";
-  string sdrbb = "\\ensuremath{\\Delta R(b,b)}";
-  string sptbb = "\\ensuremath{p_{\\mathrm{T}, bb}}";
-  string smbb = "\\ensuremath{m_{bb}}";
-  string sht = "\\ensuremath{h_\\mathrm{T}}";
 
-
-  Histo1DPtr histo1D(
-        const string& name, size_t nb, double low, double high
-      , const string& title, const string& xlab, const string& ylab) {
-
-    Histo1DPtr h = make_shared<Histo1D>(nb, low, high, name, title);
-    h->setAnnotation("XLabel", xlab);
-    h->setAnnotation("YLabel", ylab);
-    return h;
-  }
-
-
-  class TTBBHists {
+  class ZBBHists {
   public:
 
-    TTBBHists() { };
+    string spt = "\\ensuremath{p_\\mathrm{T}}";
+    string seta = "\\ensuremath{\\eta}";
+    string sdphizb = "\\ensuremath{|\\Delta\\phi(Z,b)|}";
+    string sdetazb = "\\ensuremath{|\\Delta\\eta(Z,b)|}";
+    string sdrzb = "\\ensuremath{|\\Delta R(Z,b)|}";
+    string sdphibb = "\\ensuremath{|\\Delta\\phi(b,b)|}";
+    string sdrbb = "\\ensuremath{\\Delta R(b,b)}";
+    string sptbb = "\\ensuremath{p_{\\mathrm{T}, bb}}";
+    string smbb = "\\ensuremath{m_{bb}}";
+    string sht = "\\ensuremath{h_\\mathrm{T}}";
 
-    TTBBHists(const string& prefix) {
+
+
+    Histo1DPtr histo1D(
+          const string& name, size_t nb, double low, double high
+        , const string& title, const string& xlab, const string& ylab) {
+
+      Histo1DPtr h = make_shared<Histo1D>(nb, low, high, name, title);
+      h->setAnnotation("XLabel", xlab);
+      h->setAnnotation("YLabel", ylab);
+      return h;
+    }
+
+
+    ZBBHists() { };
+
+    ZBBHists(const string& prefix) {
       h_njl = histo1D("h_" + prefix + "_njl", 10, 0, 10, "", "light-jet multiplicity", dsdx("n", "1"));
       h_njb = histo1D("h_" + prefix + "_njb", 5, 0, 5, "", "$b$-jet mulitplicity", dsdx("n", "1"));
       h_nj0b = histo1D("h_" + prefix + "_nj0b", 5, 0, 5, "", "$bb$-jet multiplicity", dsdx("n", "1"));
@@ -73,7 +75,7 @@ namespace Rivet {
 
     }
 
-    void fill(double weight, const Jets& jls, const Jets& jbs, const Jets& j0bs, const Jets& j1bs, const Particles& tops) {
+    void fill(double weight, const Jets& jls, const Jets& jbs, const Jets& j0bs, const Jets& j1bs, const Particle& zboson) {
         h_njl->fill(jls.size(), weight);
         h_njb->fill(j0bs.size()+j1bs.size(), weight);
         h_nj0b->fill(j0bs.size(), weight);
@@ -153,20 +155,18 @@ namespace Rivet {
         double mindrdeta = -1;
         double mindrdphi = -1;
         for (const Jet& jb: jbs) {
-          for (const Particle& t: tops) {
-            double dr = deltaR(jb, t);
+            double dr = deltaR(jb, zboson);
             if (mindr < 1 || dr < mindr) {
               mindr = dr;
-              mindrdphi = abs(deltaPhi(jb, t));
-              mindrdeta = abs(deltaEta(jb, t));
+              mindrdphi = abs(deltaPhi(zboson, jb));
+              mindrdeta = abs(deltaEta(zboson, jb));
             }
-          }
         }
 
         if (mindr >= 0) {
-          h_drtb->fill(mindr, weight);
-          h_dphitb->fill(mindrdphi, weight);
-          h_detatb->fill(mindrdeta, weight);
+          h_drzb->fill(mindr, weight);
+          h_dphizb->fill(mindrdphi, weight);
+          h_detazb->fill(mindrdeta, weight);
         }
 
         h_mbb->fill((b1 + b2).mass(), weight);
@@ -185,7 +185,7 @@ namespace Rivet {
           , h_j0b1pt, h_j0b2pt, h_j1b1pt, h_j1b2pt
           , h_jl1eta, h_jl2eta, h_jb1eta, h_jb2eta
           , h_j0b1eta, h_j0b2eta, h_j1b1eta, h_j1b2eta
-          , h_dphitb, h_detatb, h_drtb
+          , h_dphizb, h_detazb, h_drzb
           , h_mbb, h_dphibb, h_drbb, h_ptbb, h_ht
           };
       }
@@ -202,7 +202,7 @@ namespace Rivet {
         , h_j0b1pt, h_j0b2pt, h_j1b1pt, h_j1b2pt
         , h_jl1eta, h_jl2eta, h_jb1eta, h_jb2eta
         , h_j0b1eta, h_j0b2eta, h_j1b1eta, h_j1b2eta
-        , h_dphitb, h_detatb, h_drtb
+        , h_dphizb, h_detazb, h_drzb
         , h_mbb, h_dphibb, h_drbb, h_ptbb, h_ht;
 
     };
@@ -216,7 +216,7 @@ namespace Rivet {
 
     void init() {
 
-	  FinalState fs;
+      FinalState fs;
       ZFinder zfinder_mu(fs, Cuts::abseta < 2.4 && Cuts::pT > 20*GeV, PID::MUON, 66*GeV, 116*GeV, 0.1, ZFinder::CLUSTERNODECAY);
       declare(zfinder_mu, "ZFinder_mu");
 
@@ -227,16 +227,16 @@ namespace Rivet {
       VetoedFinalState fps(Cuts::abseta < 5);
       fps.addVetoOnThisFinalState(zfinder_el);
       fps.addVetoOnThisFinalState(zfinder_mu);
-      FinalState fps(Cuts::abseta < 5 && Cuts::abspid != 6);
+      //FinalState fps(Cuts::abseta < 5 && Cuts::abspid != 6);
 
       declare(FastJets(fps, FastJets::ANTIKT, 0.4), "Jets");
 
-      h_inclusive = TTBBHists("inclusive");
-      h_zerob = TTBBHists("zerob");
-      h_atleastoneb = TTBBHists("atleastoneb");
-      h_onej1b = TTBBHists("onej1b");
-      h_twoj1b = TTBBHists("twoj1b");
-      h_onej0b = TTBBHists("onej0b");
+      h_inclusive = ZBBHists("inclusive");
+      h_zerob = ZBBHists("zerob");
+      h_atleastoneb = ZBBHists("atleastoneb");
+      h_onej1b = ZBBHists("onej1b");
+      h_twoj1b = ZBBHists("twoj1b");
+      h_onej0b = ZBBHists("onej0b");
 
     }
 
@@ -247,8 +247,11 @@ namespace Rivet {
 
 
       // find Z bosons
-      ZFinder zboson = apply<ZFinder>(event, "ZFinder_el");
-      if (!zboson) zboson = apply<ZFinder>(event, "ZFinder_mu");
+      Particles zbosons = apply<ZFinder>(event, "ZFinder_el").particlesByPt();
+      if (zbosons.empty()) zbosons = apply<ZFinder>(event, "ZFinder_mu").particlesByPt();
+      if (zbosons.size()!=1) vetoEvent;
+
+      const Particle zboson = zbosons.at(0);
 
       // todo: check code above, access z-bosons's momentum and replace top with z below
 
@@ -295,33 +298,32 @@ namespace Rivet {
         }
 
         // inclusive selection
-        h_inclusive.fill(weight, jls, jbs, j0bs, j1bs, tquarks);
+        h_inclusive.fill(weight, jls, jbs, j0bs, j1bs, zboson);
 
         // no accepted jets with b-quarks inside
-        if (jbs.size() == 0) h_zerob.fill(weight, jls, jbs, j0bs, j1bs, tquarks);
+        if (jbs.size() == 0) h_zerob.fill(weight, jls, jbs, j0bs, j1bs, zboson);
         // at least one jet with b-quarks inside
-        else h_atleastoneb.fill(weight, jls, jbs, j0bs, j1bs, tquarks);
+        else h_atleastoneb.fill(weight, jls, jbs, j0bs, j1bs, zboson);
 
         // exactly one jet with an imbalance of b and anti-b
-        if (j1bs.size() == 1) h_onej1b.fill(weight, jls, jbs, j0bs, j1bs, tquarks);
+        if (j1bs.size() == 1) h_onej1b.fill(weight, jls, jbs, j0bs, j1bs, zboson);
         // exactly two jets with an imbalance of b and anti-b
-        else if (j1bs.size() == 2) h_twoj1b.fill(weight, jls, jbs, j0bs, j1bs, tquarks);
+        else if (j1bs.size() == 2) h_twoj1b.fill(weight, jls, jbs, j0bs, j1bs, zboson);
  
         // exactly one jet with balance of b and anti-b
-        if (j0bs.size() == 1) h_onej0b.fill(weight, jls, jbs, j0bs, j1bs, tquarks);
+        if (j0bs.size() == 1) h_onej0b.fill(weight, jls, jbs, j0bs, j1bs, zboson);
 
         return;
       }
 
 
         void finalize() {
-          vector<TTBBHists> hists =
+          vector<ZBBHists> hists =
             { h_inclusive, h_zerob, h_atleastoneb, h_onej0b
-            , h_onej1b, h_twoj1b, h_atleasttwoj1b, h_threej1b
-            , h_fourj1b, h_mbbgt100
+            , h_onej1b, h_twoj1b
             };
 
-          for (TTBBHists& hist: hists) {
+          for (ZBBHists& hist: hists) {
             for (Histo1DPtr h: hist.histograms()) {
               Histo1DPtr ph = make_shared<Histo1D>(*h);
               ph->setPath(histoDir() + ph->path());
@@ -332,7 +334,7 @@ namespace Rivet {
       }
 
     private:
-      TTBBHists h_inclusive, h_zerob, h_atleastoneb, h_onej1b, h_twoj1b, h_onej0b;
+      ZBBHists h_inclusive, h_zerob, h_atleastoneb, h_onej1b, h_twoj1b, h_onej0b;
 
     };
 
