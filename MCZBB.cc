@@ -247,11 +247,11 @@ namespace Rivet {
 
 
       // find Z bosons
-      Particles zbosons = apply<ZFinder>(event, "ZFinder_el").particlesByPt();
-      if (zbosons.empty()) zbosons = apply<ZFinder>(event, "ZFinder_mu").particlesByPt();
-      if (zbosons.size()!=1) vetoEvent;
+      Particles zbosons = apply<ZFinder>(event, "ZFinder_el").bosons();
+      if (zbosons.empty()) zbosons = apply<ZFinder>(event, "ZFinder_mu").bosons();
 
-      const Particle zboson = zbosons.at(0);
+      if(zbosons.empty()) vetoEvent;
+      const Particle & zboson = zbosons.at(0);
 
       // todo: check code above, access z-bosons's momentum and replace top with z below
 
