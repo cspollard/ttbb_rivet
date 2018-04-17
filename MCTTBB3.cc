@@ -20,7 +20,6 @@ namespace Rivet {
   string smbb = "\\ensuremath{m_{bb}}";
   string sht = "\\ensuremath{h_\\mathrm{T}}";
 
-
   Histo1DPtr histo1D(
         const string& name, size_t nb, double low, double high
       , const string& title, const string& xlab, const string& ylab) {
@@ -32,45 +31,111 @@ namespace Rivet {
   }
 
 
+  // a simple wrapper around a histogram that stores histograms corresponding to
+  // positive- and negative-weighted events.
+
+  class TTBBHist {
+  public:
+    TTBBHist() { };
+
+    TTBBHist(
+        const string& name, size_t nb, double low, double high
+      , const string& title, const string& xlab, const string& ylab) {
+        hnom = histo1D(name, nb, low, high, title, xlab, ylab);
+        hpos = histo1D(name + "_pos", nb, low, high, title, xlab, ylab);
+        hneg = histo1D(name + "_neg", nb, low, high, title, xlab, ylab);
+      }
+
+    void fill(double xval, double weight) {
+      hnom->fill(xval, weight);
+      if (weight >= 0) hpos->fill(xval, weight);
+      else hneg->fill(xval, -weight);
+      return;
+    }
+
+    Histo1DPtr nominal() {
+      return hnom;
+    }
+
+    Histo1DPtr positive() {
+      return hpos;
+    }
+
+    Histo1DPtr negative() {
+      return hneg;
+    }
+
+    // returns a histogram showing the (weighted) fraction of positive events
+    Scatter2DPtr posfrac() {
+      Histo1D nom = *hpos + *hneg;
+      Scatter2DPtr s = make_shared<Scatter2D>(divide(*hpos, nom));
+      s->setPath(hnom->path() + "_posfrac");
+      return s;
+    }
+
+
+    // returns a histogram showing the (weighted) fraction of negative events
+    Scatter2DPtr negfrac() {
+      Histo1D nom = *hpos + *hneg;
+      Scatter2DPtr s = make_shared<Scatter2D>(divide(*hneg, nom));
+      s->setPath(hnom->path() + "_negfrac");
+      return s;
+    }
+
+    vector<Histo1DPtr> histograms() {
+      return { hnom, hpos, hneg };
+    }
+
+    vector<Scatter2DPtr> fractions() {
+      return { posfrac(), negfrac() };
+    }
+
+  private:
+    Histo1DPtr hnom;
+    Histo1DPtr hpos;
+    Histo1DPtr hneg;
+  };
+
+
+
   class TTBBHists {
   public:
 
     TTBBHists() { };
 
     TTBBHists(const string& prefix) {
-      h_njl = histo1D("h_" + prefix + "_njl", 10, 0, 10, "", "light-jet multiplicity", dsdx("n", "1"));
-      h_njb = histo1D("h_" + prefix + "_njb", 5, 0, 5, "", "$b$-jet mulitplicity", dsdx("n", "1"));
-      h_nj0b = histo1D("h_" + prefix + "_nj0b", 5, 0, 5, "", "$bb$-jet multiplicity", dsdx("n", "1"));
-      h_nj1b = histo1D("h_" + prefix + "_nj1b", 5, 0, 5, "", "$b1$-jet multiplicity", dsdx("n", "1"));
+      h_njl = make_shared<TTBBHist>("h_" + prefix + "_njl", 10, 0, 10, "", "light-jet multiplicity", dsdx("n", "1"));
+      h_njb = make_shared<TTBBHist>("h_" + prefix + "_njb", 5, 0, 5, "", "$b$-jet mulitplicity", dsdx("n", "1"));
+      h_nj0b = make_shared<TTBBHist>("h_" + prefix + "_nj0b", 5, 0, 5, "", "$bb$-jet multiplicity", dsdx("n", "1"));
+      h_nj1b = make_shared<TTBBHist>("h_" + prefix + "_nj1b", 5, 0, 5, "", "$b1$-jet multiplicity", dsdx("n", "1"));
 
-      h_jl1pt = histo1D("h_" + prefix + "_jl1pt", 50, 0, 500*GeV, "", "leading light-jet " + spt + " [GeV]", dsdx(spt, "\\mathrm{GeV}"));
-      h_jl2pt = histo1D("h_" + prefix + "_jl2pt", 50, 0, 500*GeV, "", "subleading light-jet " + spt + " [GeV]", dsdx(spt, "\\mathrm{GeV}"));
-      h_jb1pt = histo1D("h_" + prefix + "_jb1pt", 50, 0, 500*GeV, "", "leading $b$-jet " + spt + " [GeV]", dsdx(spt, "\\mathrm{GeV}"));
-      h_jb2pt = histo1D("h_" + prefix + "_jb2pt", 50, 0, 500*GeV, "", "subleading $b$-jet " + spt + " [GeV]", dsdx(spt, "\\mathrm{GeV}"));
-      h_j0b1pt = histo1D("h_" + prefix + "_j0b1pt", 50, 0, 500*GeV, "", "leading $bb$-jet " + spt + " [GeV]", dsdx(spt, "\\mathrm{GeV}"));
-      h_j0b2pt = histo1D("h_" + prefix + "_j0b2pt", 50, 0, 500*GeV, "", "subleading $bb$-jet " + spt + " [GeV]", dsdx(spt, "\\mathrm{GeV}"));
-      h_j1b1pt = histo1D("h_" + prefix + "_j1b1pt", 50, 0, 500*GeV, "", "leading $b1$-jet " + spt + " [GeV]", dsdx(spt, "\\mathrm{GeV}"));
-      h_j1b2pt = histo1D("h_" + prefix + "_j1b2pt", 50, 0, 500*GeV, "", "subleading $b1$-jet " + spt + " [GeV]", dsdx(spt, "\\mathrm{GeV}"));
+      h_jl1pt = make_shared<TTBBHist>("h_" + prefix + "_jl1pt", 50, 0, 500*GeV, "", "leading light-jet " + spt + " [GeV]", dsdx(spt, "\\mathrm{GeV}"));
+      h_jl2pt = make_shared<TTBBHist>("h_" + prefix + "_jl2pt", 50, 0, 500*GeV, "", "subleading light-jet " + spt + " [GeV]", dsdx(spt, "\\mathrm{GeV}"));
+      h_jb1pt = make_shared<TTBBHist>("h_" + prefix + "_jb1pt", 50, 0, 500*GeV, "", "leading $b$-jet " + spt + " [GeV]", dsdx(spt, "\\mathrm{GeV}"));
+      h_jb2pt = make_shared<TTBBHist>("h_" + prefix + "_jb2pt", 50, 0, 500*GeV, "", "subleading $b$-jet " + spt + " [GeV]", dsdx(spt, "\\mathrm{GeV}"));
+      h_j0b1pt = make_shared<TTBBHist>("h_" + prefix + "_j0b1pt", 50, 0, 500*GeV, "", "leading $bb$-jet " + spt + " [GeV]", dsdx(spt, "\\mathrm{GeV}"));
+      h_j0b2pt = make_shared<TTBBHist>("h_" + prefix + "_j0b2pt", 50, 0, 500*GeV, "", "subleading $bb$-jet " + spt + " [GeV]", dsdx(spt, "\\mathrm{GeV}"));
+      h_j1b1pt = make_shared<TTBBHist>("h_" + prefix + "_j1b1pt", 50, 0, 500*GeV, "", "leading $b1$-jet " + spt + " [GeV]", dsdx(spt, "\\mathrm{GeV}"));
+      h_j1b2pt = make_shared<TTBBHist>("h_" + prefix + "_j1b2pt", 50, 0, 500*GeV, "", "subleading $b1$-jet " + spt + " [GeV]", dsdx(spt, "\\mathrm{GeV}"));
 
-      h_jl1eta = histo1D("h_" + prefix + "_jl1eta", 30, -3, 3, "", "leading light-jet " + seta, dsdx(seta, "\\mathrm{GeV}"));
-      h_jl2eta = histo1D("h_" + prefix + "_jl2eta", 30, -3, 3, "", "subleading light-jet " + seta, dsdx(seta, "\\mathrm{GeV}"));
-      h_jb1eta = histo1D("h_" + prefix + "_jb1eta", 30, -3, 3, "", "leading $b$-jet " + seta, dsdx(seta, "\\mathrm{GeV}"));
-      h_jb2eta = histo1D("h_" + prefix + "_jb2eta", 30, -3, 3, "", "subleading $b$-jet " + seta, dsdx(seta, "\\mathrm{GeV}"));
-      h_j0b1eta = histo1D("h_" + prefix + "_j0b1eta", 30, -3, 3, "", "leading $bb$-jet " + seta, dsdx(seta, "\\mathrm{GeV}"));
-      h_j0b2eta = histo1D("h_" + prefix + "_j0b2eta", 30, -3, 3, "", "subleading $bb$-jet " + seta, dsdx(seta, "\\mathrm{GeV}"));
-      h_j1b1eta = histo1D("h_" + prefix + "_j1b1eta", 30, -3, 3, "", "leading $b1$-jet " + seta, dsdx(seta, "\\mathrm{GeV}"));
-      h_j1b2eta = histo1D("h_" + prefix + "_j1b2eta", 30, -3, 3, "", "subleading $b1$-jet " + seta, dsdx(seta, "\\mathrm{GeV}"));
+      h_jl1eta = make_shared<TTBBHist>("h_" + prefix + "_jl1eta", 30, -3, 3, "", "leading light-jet " + seta, dsdx(seta, "\\mathrm{GeV}"));
+      h_jl2eta = make_shared<TTBBHist>("h_" + prefix + "_jl2eta", 30, -3, 3, "", "subleading light-jet " + seta, dsdx(seta, "\\mathrm{GeV}"));
+      h_jb1eta = make_shared<TTBBHist>("h_" + prefix + "_jb1eta", 30, -3, 3, "", "leading $b$-jet " + seta, dsdx(seta, "\\mathrm{GeV}"));
+      h_jb2eta = make_shared<TTBBHist>("h_" + prefix + "_jb2eta", 30, -3, 3, "", "subleading $b$-jet " + seta, dsdx(seta, "\\mathrm{GeV}"));
+      h_j0b1eta = make_shared<TTBBHist>("h_" + prefix + "_j0b1eta", 30, -3, 3, "", "leading $bb$-jet " + seta, dsdx(seta, "\\mathrm{GeV}"));
+      h_j0b2eta = make_shared<TTBBHist>("h_" + prefix + "_j0b2eta", 30, -3, 3, "", "subleading $bb$-jet " + seta, dsdx(seta, "\\mathrm{GeV}"));
+      h_j1b1eta = make_shared<TTBBHist>("h_" + prefix + "_j1b1eta", 30, -3, 3, "", "leading $b1$-jet " + seta, dsdx(seta, "\\mathrm{GeV}"));
+      h_j1b2eta = make_shared<TTBBHist>("h_" + prefix + "_j1b2eta", 30, -3, 3, "", "subleading $b1$-jet " + seta, dsdx(seta, "\\mathrm{GeV}"));
 
-      h_dphitb = histo1D("h_" + prefix + "_dphitb", 50, 0, 4, "", sdphitb, dsdx(sdphitb, "\\mathrm{1}"));
-      h_detatb = histo1D("h_" + prefix + "_detatb", 50, 0, 4, "", sdetatb, dsdx(sdetatb, "\\mathrm{1}"));
-      h_drtb = histo1D("h_" + prefix + "_drtb", 50, 0, 4, "", sdrtb, dsdx(sdrtb, "\\mathrm{1}"));
+      h_dphitb = make_shared<TTBBHist>("h_" + prefix + "_dphitb", 50, 0, 4, "", sdphitb, dsdx(sdphitb, "\\mathrm{1}"));
+      h_detatb = make_shared<TTBBHist>("h_" + prefix + "_detatb", 50, 0, 4, "", sdetatb, dsdx(sdetatb, "\\mathrm{1}"));
+      h_drtb = make_shared<TTBBHist>("h_" + prefix + "_drtb", 50, 0, 4, "", sdrtb, dsdx(sdrtb, "\\mathrm{1}"));
 
-      h_mbb = histo1D("h_" + prefix + "_mbb", 50, 0, 500*GeV, "", smbb + " [GeV]", dsdx(smbb, "\\mathrm{GeV}"));
-      h_dphibb = histo1D("h_" + prefix + "_dphibb", 50, 0, 4, "", sdphibb, dsdx(sdphibb, "1"));
-      h_drbb = histo1D("h_" + prefix + "_drbb", 50, 0, 5, "", sdrbb, dsdx(sdrbb, "1"));
-      h_ptbb = histo1D("h_" + prefix + "_ptbb", 50, 0, 500*GeV, "", sptbb + " [GeV]", dsdx(sptbb, "\\mathrm{GeV}"));
-      h_ht = histo1D("h_" + prefix + "_ht", 50, 0, 2000*GeV, "", sht + " [GeV]", dsdx(sht, "\\mathrm{GeV}"));
-
+      h_mbb = make_shared<TTBBHist>("h_" + prefix + "_mbb", 50, 0, 500*GeV, "", smbb + " [GeV]", dsdx(smbb, "\\mathrm{GeV}"));
+      h_dphibb = make_shared<TTBBHist>("h_" + prefix + "_dphibb", 50, 0, 4, "", sdphibb, dsdx(sdphibb, "1"));
+      h_drbb = make_shared<TTBBHist>("h_" + prefix + "_drbb", 50, 0, 5, "", sdrbb, dsdx(sdrbb, "1"));
+      h_ptbb = make_shared<TTBBHist>("h_" + prefix + "_ptbb", 50, 0, 500*GeV, "", sptbb + " [GeV]", dsdx(sptbb, "\\mathrm{GeV}"));
+      h_ht = make_shared<TTBBHist>("h_" + prefix + "_ht", 50, 0, 2000*GeV, "", sht + " [GeV]", dsdx(sht, "\\mathrm{GeV}"));
     }
 
     void fill(double weight, const Jets& jls, const Jets& jbs, const Jets& j0bs, const Jets& j1bs, const Particles& tops) {
@@ -180,7 +245,7 @@ namespace Rivet {
 
       // this has to be a vector<Histo1DPtr> rather than vector<Histo1D> because
       // the Histo1D copy constructor loses all annotations?!?!?!?
-      vector<Histo1DPtr> histograms() {
+      vector<shared_ptr<TTBBHist>> histograms() {
         return
           { h_njl, h_njb, h_nj0b, h_nj1b
           , h_jl1pt, h_jl2pt, h_jb1pt, h_jb2pt
@@ -198,7 +263,7 @@ namespace Rivet {
       }
 
 
-      Histo1DPtr
+      shared_ptr<TTBBHist>
           h_njl, h_njb, h_nj0b, h_nj1b
         , h_jl1pt, h_jl2pt, h_jb1pt, h_jb2pt
         , h_j0b1pt, h_j0b2pt, h_j1b1pt, h_j1b2pt
@@ -324,19 +389,27 @@ namespace Rivet {
       }
 
 
-        void finalize() {
-          vector<TTBBHists> hists =
-            { h_inclusive, h_zerob, h_atleastoneb, h_onej0b
-            , h_onej1b, h_twoj1b, h_atleasttwoj1b, h_threej1b
-            , h_fourj1b, h_mbbgt100
-            };
+      void finalize() {
+        vector<TTBBHists> hists =
+        { h_inclusive, h_zerob, h_atleastoneb, h_onej0b
+          , h_onej1b, h_twoj1b, h_atleasttwoj1b, h_threej1b
+          , h_fourj1b, h_mbbgt100
+        };
 
-          for (TTBBHists& hist: hists) {
-            for (Histo1DPtr h: hist.histograms()) {
+        for (TTBBHists& ttbbhists: hists) {
+          for (shared_ptr<TTBBHist>& ttbbhist: ttbbhists.histograms()) {
+            for (Histo1DPtr& h: ttbbhist->histograms()) {
               Histo1DPtr ph = make_shared<Histo1D>(*h);
               ph->setPath(histoDir() + ph->path());
               scale(ph, crossSection()/picobarn/sumOfWeights());
               addAnalysisObject(ph);
+            }
+
+            for (Scatter2DPtr& h: ttbbhist->fractions()) {
+              Scatter2DPtr ph = make_shared<Scatter2D>(*h);
+              ph->setPath(histoDir() + ph->path());
+              addAnalysisObject(ph);
+            }
           }
         }
       }
