@@ -398,18 +398,14 @@ namespace Rivet {
 
         for (TTBBHists& ttbbhists: hists) {
           for (shared_ptr<TTBBHist>& ttbbhist: ttbbhists.histograms()) {
-            for (Histo1DPtr& h: ttbbhist->histograms()) {
-              Histo1DPtr ph = make_shared<Histo1D>(*h);
-              ph->setPath(histoDir() + ph->path());
-              scale(ph, crossSection()/picobarn/sumOfWeights());
-              addAnalysisObject(ph);
-            }
+            Histo1DPtr ph = ttbbhist->nominal();
+            ph->setPath(histoDir() + ph->path());
+            scale(ph, crossSection()/picobarn/sumOfWeights());
+            addAnalysisObject(ph);
 
-            for (Scatter2DPtr& h: ttbbhist->fractions()) {
-              Scatter2DPtr ph = make_shared<Scatter2D>(*h);
-              ph->setPath(histoDir() + ph->path());
-              addAnalysisObject(ph);
-            }
+            Scatter2DPtr ps = ttbbhist->posfrac();
+            ps->setPath(histoDir() + ps->path());
+            addAnalysisObject(ps);
           }
         }
       }
