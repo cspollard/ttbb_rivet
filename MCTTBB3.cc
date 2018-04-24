@@ -42,8 +42,8 @@ namespace Rivet {
         const string& name, size_t nb, double low, double high
       , const string& title, const string& xlab, const string& ylab) {
         hnom = histo1D(name, nb, low, high, title, xlab, ylab);
-        hpos = histo1D(name + "_pos", nb, low, high, title, xlab, ylab);
-        hneg = histo1D(name + "_neg", nb, low, high, title, xlab, ylab);
+        hpos = histo1D(name + "_onlypos", nb, low, high, title, xlab, ylab);
+        hneg = histo1D(name + "_onlyneg", nb, low, high, title, xlab, ylab);
       }
 
     void fill(double xval, double weight) {
@@ -65,6 +65,7 @@ namespace Rivet {
       return hneg;
     }
 
+    /*
     // returns a histogram showing the (weighted) fraction of positive events
     Scatter2DPtr posfrac() {
       Histo1D nom = *hpos + *hneg;
@@ -81,14 +82,17 @@ namespace Rivet {
       s->setPath(hnom->path() + "_negfrac");
       return s;
     }
+    */
 
     vector<Histo1DPtr> histograms() {
       return { hnom, hpos, hneg };
     }
 
-    vector<Scatter2DPtr> fractions() {
+  /*  vector<Scatter2DPtr> fractions() {
       return { posfrac(), negfrac() };
     }
+
+  */
 
   private:
     Histo1DPtr hnom;
@@ -403,9 +407,21 @@ namespace Rivet {
             scale(ph, crossSection()/picobarn/sumOfWeights());
             addAnalysisObject(ph);
 
+            Histo1DPtr neg = ttbbhist->negative();
+            neg->setPath(histoDir() + neg->path());
+            scale(neg, crossSection()/picobarn/sumOfWeights());
+            addAnalysisObject(neg);
+
+            Histo1DPtr pos = ttbbhist->positive();
+            pos->setPath(histoDir() + pos->path());
+            scale(pos, crossSection()/picobarn/sumOfWeights());
+            addAnalysisObject(pos);
+
+            /*
             Scatter2DPtr ps = ttbbhist->posfrac();
             ps->setPath(histoDir() + ps->path());
             addAnalysisObject(ps);
+            */
           }
         }
       }
