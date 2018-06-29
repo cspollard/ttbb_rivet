@@ -401,9 +401,10 @@ namespace Rivet {
 
       void finalize() {
         vector<TTBBHists> hists =
-        { h_inclusive, h_zerob, h_atleastoneb, h_onej0b
+        { h_inclusive, h_inclusive_j15, h_inclusive_j30, h_inclusive_j40
+          , h_zerob, h_atleastoneb, h_onej0b
           , h_onej1b, h_twoj1b, h_atleasttwoj1b, h_threej1b
-            , h_fourj1b, h_mbbgt100
+          , h_fourj1b, h_mbbgt100
         };
 
         for (TTBBHists& ttbbhists: hists) {
