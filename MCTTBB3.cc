@@ -21,7 +21,7 @@ namespace Rivet {
   string sht = "\\ensuremath{h_\\mathrm{T}}";
 
   Histo1DPtr histo1D(
-        const string& name, size_t nb, double low, double high
+      const string& name, size_t nb, double low, double high
       , const string& title, const string& xlab, const string& ylab) {
 
     Histo1DPtr h = make_shared<Histo1D>(nb, low, high, name, title);
@@ -35,114 +35,114 @@ namespace Rivet {
   // positive- and negative-weighted events.
 
   class TTBBHist {
-  public:
-    TTBBHist() { };
+    public:
+      TTBBHist() { };
 
-    TTBBHist(
-        const string& name, size_t nb, double low, double high
-      , const string& title, const string& xlab, const string& ylab) {
+      TTBBHist(
+          const string& name, size_t nb, double low, double high
+          , const string& title, const string& xlab, const string& ylab) {
         hnom = histo1D(name, nb, low, high, title, xlab, ylab);
         hpos = histo1D(name + "_onlypos", nb, low, high, title, xlab, ylab);
         hneg = histo1D(name + "_onlyneg", nb, low, high, title, xlab, ylab);
       }
 
-    void fill(double xval, double weight) {
-      hnom->fill(xval, weight);
-      if (weight >= 0) hpos->fill(xval, weight);
-      else hneg->fill(xval, -weight);
-      return;
-    }
+      void fill(double xval, double weight) {
+        hnom->fill(xval, weight);
+        if (weight >= 0) hpos->fill(xval, weight);
+        else hneg->fill(xval, -weight);
+        return;
+      }
 
-    Histo1DPtr nominal() {
-      return hnom;
-    }
+      Histo1DPtr nominal() {
+        return hnom;
+      }
 
-    Histo1DPtr positive() {
-      return hpos;
-    }
+      Histo1DPtr positive() {
+        return hpos;
+      }
 
-    Histo1DPtr negative() {
-      return hneg;
-    }
+      Histo1DPtr negative() {
+        return hneg;
+      }
 
-    /*
-    // returns a histogram showing the (weighted) fraction of positive events
-    Scatter2DPtr posfrac() {
+      /*
+      // returns a histogram showing the (weighted) fraction of positive events
+      Scatter2DPtr posfrac() {
       Histo1D nom = *hpos + *hneg;
       Scatter2DPtr s = make_shared<Scatter2D>(divide(*hpos, nom));
       s->setPath(hnom->path() + "_posfrac");
       return s;
-    }
+      }
 
 
-    // returns a histogram showing the (weighted) fraction of negative events
-    Scatter2DPtr negfrac() {
+      // returns a histogram showing the (weighted) fraction of negative events
+      Scatter2DPtr negfrac() {
       Histo1D nom = *hpos + *hneg;
       Scatter2DPtr s = make_shared<Scatter2D>(divide(*hneg, nom));
       s->setPath(hnom->path() + "_negfrac");
       return s;
-    }
-    */
+      }
+      */
 
-    vector<Histo1DPtr> histograms() {
-      return { hnom, hpos, hneg };
-    }
+      vector<Histo1DPtr> histograms() {
+        return { hnom, hpos, hneg };
+      }
 
-  /*  vector<Scatter2DPtr> fractions() {
-      return { posfrac(), negfrac() };
-    }
+      /*  vector<Scatter2DPtr> fractions() {
+          return { posfrac(), negfrac() };
+          }
 
-  */
+*/
 
-  private:
-    Histo1DPtr hnom;
-    Histo1DPtr hpos;
-    Histo1DPtr hneg;
+    private:
+      Histo1DPtr hnom;
+      Histo1DPtr hpos;
+      Histo1DPtr hneg;
   };
 
 
 
   class TTBBHists {
-  public:
+    public:
 
-    TTBBHists() { };
+      TTBBHists() { };
 
-    TTBBHists(const string& prefix) {
-      h_njl = make_shared<TTBBHist>("h_" + prefix + "_njl", 10, 0, 10, "", "light-jet multiplicity", dsdx("n", "1"));
-      h_njb = make_shared<TTBBHist>("h_" + prefix + "_njb", 5, 0, 5, "", "$b$-jet mulitplicity", dsdx("n", "1"));
-      h_nj0b = make_shared<TTBBHist>("h_" + prefix + "_nj0b", 5, 0, 5, "", "$bb$-jet multiplicity", dsdx("n", "1"));
-      h_nj1b = make_shared<TTBBHist>("h_" + prefix + "_nj1b", 5, 0, 5, "", "$b1$-jet multiplicity", dsdx("n", "1"));
+      TTBBHists(const string& prefix) {
+        h_njl = make_shared<TTBBHist>("h_" + prefix + "_njl", 10, 0, 10, "", "light-jet multiplicity", dsdx("n", "1"));
+        h_njb = make_shared<TTBBHist>("h_" + prefix + "_njb", 5, 0, 5, "", "$b$-jet mulitplicity", dsdx("n", "1"));
+        h_nj0b = make_shared<TTBBHist>("h_" + prefix + "_nj0b", 5, 0, 5, "", "$bb$-jet multiplicity", dsdx("n", "1"));
+        h_nj1b = make_shared<TTBBHist>("h_" + prefix + "_nj1b", 5, 0, 5, "", "$b1$-jet multiplicity", dsdx("n", "1"));
 
-      h_jl1pt = make_shared<TTBBHist>("h_" + prefix + "_jl1pt", 50, 0, 500*GeV, "", "leading light-jet " + spt + " [GeV]", dsdx(spt, "\\mathrm{GeV}"));
-      h_jl2pt = make_shared<TTBBHist>("h_" + prefix + "_jl2pt", 50, 0, 500*GeV, "", "subleading light-jet " + spt + " [GeV]", dsdx(spt, "\\mathrm{GeV}"));
-      h_jb1pt = make_shared<TTBBHist>("h_" + prefix + "_jb1pt", 50, 0, 500*GeV, "", "leading $b$-jet " + spt + " [GeV]", dsdx(spt, "\\mathrm{GeV}"));
-      h_jb2pt = make_shared<TTBBHist>("h_" + prefix + "_jb2pt", 50, 0, 500*GeV, "", "subleading $b$-jet " + spt + " [GeV]", dsdx(spt, "\\mathrm{GeV}"));
-      h_j0b1pt = make_shared<TTBBHist>("h_" + prefix + "_j0b1pt", 50, 0, 500*GeV, "", "leading $bb$-jet " + spt + " [GeV]", dsdx(spt, "\\mathrm{GeV}"));
-      h_j0b2pt = make_shared<TTBBHist>("h_" + prefix + "_j0b2pt", 50, 0, 500*GeV, "", "subleading $bb$-jet " + spt + " [GeV]", dsdx(spt, "\\mathrm{GeV}"));
-      h_j1b1pt = make_shared<TTBBHist>("h_" + prefix + "_j1b1pt", 50, 0, 500*GeV, "", "leading $b1$-jet " + spt + " [GeV]", dsdx(spt, "\\mathrm{GeV}"));
-      h_j1b2pt = make_shared<TTBBHist>("h_" + prefix + "_j1b2pt", 50, 0, 500*GeV, "", "subleading $b1$-jet " + spt + " [GeV]", dsdx(spt, "\\mathrm{GeV}"));
+        h_jl1pt = make_shared<TTBBHist>("h_" + prefix + "_jl1pt", 50, 0, 500*GeV, "", "leading light-jet " + spt + " [GeV]", dsdx(spt, "\\mathrm{GeV}"));
+        h_jl2pt = make_shared<TTBBHist>("h_" + prefix + "_jl2pt", 50, 0, 500*GeV, "", "subleading light-jet " + spt + " [GeV]", dsdx(spt, "\\mathrm{GeV}"));
+        h_jb1pt = make_shared<TTBBHist>("h_" + prefix + "_jb1pt", 50, 0, 500*GeV, "", "leading $b$-jet " + spt + " [GeV]", dsdx(spt, "\\mathrm{GeV}"));
+        h_jb2pt = make_shared<TTBBHist>("h_" + prefix + "_jb2pt", 50, 0, 500*GeV, "", "subleading $b$-jet " + spt + " [GeV]", dsdx(spt, "\\mathrm{GeV}"));
+        h_j0b1pt = make_shared<TTBBHist>("h_" + prefix + "_j0b1pt", 50, 0, 500*GeV, "", "leading $bb$-jet " + spt + " [GeV]", dsdx(spt, "\\mathrm{GeV}"));
+        h_j0b2pt = make_shared<TTBBHist>("h_" + prefix + "_j0b2pt", 50, 0, 500*GeV, "", "subleading $bb$-jet " + spt + " [GeV]", dsdx(spt, "\\mathrm{GeV}"));
+        h_j1b1pt = make_shared<TTBBHist>("h_" + prefix + "_j1b1pt", 50, 0, 500*GeV, "", "leading $b1$-jet " + spt + " [GeV]", dsdx(spt, "\\mathrm{GeV}"));
+        h_j1b2pt = make_shared<TTBBHist>("h_" + prefix + "_j1b2pt", 50, 0, 500*GeV, "", "subleading $b1$-jet " + spt + " [GeV]", dsdx(spt, "\\mathrm{GeV}"));
 
-      h_jl1eta = make_shared<TTBBHist>("h_" + prefix + "_jl1eta", 30, -3, 3, "", "leading light-jet " + seta, dsdx(seta, "\\mathrm{GeV}"));
-      h_jl2eta = make_shared<TTBBHist>("h_" + prefix + "_jl2eta", 30, -3, 3, "", "subleading light-jet " + seta, dsdx(seta, "\\mathrm{GeV}"));
-      h_jb1eta = make_shared<TTBBHist>("h_" + prefix + "_jb1eta", 30, -3, 3, "", "leading $b$-jet " + seta, dsdx(seta, "\\mathrm{GeV}"));
-      h_jb2eta = make_shared<TTBBHist>("h_" + prefix + "_jb2eta", 30, -3, 3, "", "subleading $b$-jet " + seta, dsdx(seta, "\\mathrm{GeV}"));
-      h_j0b1eta = make_shared<TTBBHist>("h_" + prefix + "_j0b1eta", 30, -3, 3, "", "leading $bb$-jet " + seta, dsdx(seta, "\\mathrm{GeV}"));
-      h_j0b2eta = make_shared<TTBBHist>("h_" + prefix + "_j0b2eta", 30, -3, 3, "", "subleading $bb$-jet " + seta, dsdx(seta, "\\mathrm{GeV}"));
-      h_j1b1eta = make_shared<TTBBHist>("h_" + prefix + "_j1b1eta", 30, -3, 3, "", "leading $b1$-jet " + seta, dsdx(seta, "\\mathrm{GeV}"));
-      h_j1b2eta = make_shared<TTBBHist>("h_" + prefix + "_j1b2eta", 30, -3, 3, "", "subleading $b1$-jet " + seta, dsdx(seta, "\\mathrm{GeV}"));
+        h_jl1eta = make_shared<TTBBHist>("h_" + prefix + "_jl1eta", 30, -3, 3, "", "leading light-jet " + seta, dsdx(seta, "\\mathrm{GeV}"));
+        h_jl2eta = make_shared<TTBBHist>("h_" + prefix + "_jl2eta", 30, -3, 3, "", "subleading light-jet " + seta, dsdx(seta, "\\mathrm{GeV}"));
+        h_jb1eta = make_shared<TTBBHist>("h_" + prefix + "_jb1eta", 30, -3, 3, "", "leading $b$-jet " + seta, dsdx(seta, "\\mathrm{GeV}"));
+        h_jb2eta = make_shared<TTBBHist>("h_" + prefix + "_jb2eta", 30, -3, 3, "", "subleading $b$-jet " + seta, dsdx(seta, "\\mathrm{GeV}"));
+        h_j0b1eta = make_shared<TTBBHist>("h_" + prefix + "_j0b1eta", 30, -3, 3, "", "leading $bb$-jet " + seta, dsdx(seta, "\\mathrm{GeV}"));
+        h_j0b2eta = make_shared<TTBBHist>("h_" + prefix + "_j0b2eta", 30, -3, 3, "", "subleading $bb$-jet " + seta, dsdx(seta, "\\mathrm{GeV}"));
+        h_j1b1eta = make_shared<TTBBHist>("h_" + prefix + "_j1b1eta", 30, -3, 3, "", "leading $b1$-jet " + seta, dsdx(seta, "\\mathrm{GeV}"));
+        h_j1b2eta = make_shared<TTBBHist>("h_" + prefix + "_j1b2eta", 30, -3, 3, "", "subleading $b1$-jet " + seta, dsdx(seta, "\\mathrm{GeV}"));
 
-      h_dphitb = make_shared<TTBBHist>("h_" + prefix + "_dphitb", 50, 0, 4, "", sdphitb, dsdx(sdphitb, "\\mathrm{1}"));
-      h_detatb = make_shared<TTBBHist>("h_" + prefix + "_detatb", 50, 0, 4, "", sdetatb, dsdx(sdetatb, "\\mathrm{1}"));
-      h_drtb = make_shared<TTBBHist>("h_" + prefix + "_drtb", 50, 0, 4, "", sdrtb, dsdx(sdrtb, "\\mathrm{1}"));
+        h_dphitb = make_shared<TTBBHist>("h_" + prefix + "_dphitb", 50, 0, 4, "", sdphitb, dsdx(sdphitb, "\\mathrm{1}"));
+        h_detatb = make_shared<TTBBHist>("h_" + prefix + "_detatb", 50, 0, 4, "", sdetatb, dsdx(sdetatb, "\\mathrm{1}"));
+        h_drtb = make_shared<TTBBHist>("h_" + prefix + "_drtb", 50, 0, 4, "", sdrtb, dsdx(sdrtb, "\\mathrm{1}"));
 
-      h_mbb = make_shared<TTBBHist>("h_" + prefix + "_mbb", 50, 0, 500*GeV, "", smbb + " [GeV]", dsdx(smbb, "\\mathrm{GeV}"));
-      h_dphibb = make_shared<TTBBHist>("h_" + prefix + "_dphibb", 50, 0, 4, "", sdphibb, dsdx(sdphibb, "1"));
-      h_drbb = make_shared<TTBBHist>("h_" + prefix + "_drbb", 50, 0, 5, "", sdrbb, dsdx(sdrbb, "1"));
-      h_ptbb = make_shared<TTBBHist>("h_" + prefix + "_ptbb", 50, 0, 500*GeV, "", sptbb + " [GeV]", dsdx(sptbb, "\\mathrm{GeV}"));
-      h_ht = make_shared<TTBBHist>("h_" + prefix + "_ht", 50, 0, 2000*GeV, "", sht + " [GeV]", dsdx(sht, "\\mathrm{GeV}"));
-    }
+        h_mbb = make_shared<TTBBHist>("h_" + prefix + "_mbb", 50, 0, 500*GeV, "", smbb + " [GeV]", dsdx(smbb, "\\mathrm{GeV}"));
+        h_dphibb = make_shared<TTBBHist>("h_" + prefix + "_dphibb", 50, 0, 4, "", sdphibb, dsdx(sdphibb, "1"));
+        h_drbb = make_shared<TTBBHist>("h_" + prefix + "_drbb", 50, 0, 5, "", sdrbb, dsdx(sdrbb, "1"));
+        h_ptbb = make_shared<TTBBHist>("h_" + prefix + "_ptbb", 50, 0, 500*GeV, "", sptbb + " [GeV]", dsdx(sptbb, "\\mathrm{GeV}"));
+        h_ht = make_shared<TTBBHist>("h_" + prefix + "_ht", 50, 0, 2000*GeV, "", sht + " [GeV]", dsdx(sht, "\\mathrm{GeV}"));
+      }
 
-    void fill(double weight, const Jets& jls, const Jets& jbs, const Jets& j0bs, const Jets& j1bs, const Particles& tops) {
+      void fill(double weight, const Jets& jls, const Jets& jbs, const Jets& j0bs, const Jets& j1bs, const Particles& tops) {
         h_njl->fill(jls.size(), weight);
         h_njb->fill(j0bs.size()+j1bs.size(), weight);
         h_nj0b->fill(j0bs.size(), weight);
@@ -251,14 +251,14 @@ namespace Rivet {
       // the Histo1D copy constructor loses all annotations?!?!?!?
       vector<shared_ptr<TTBBHist>> histograms() {
         return
-          { h_njl, h_njb, h_nj0b, h_nj1b
+        { h_njl, h_njb, h_nj0b, h_nj1b
           , h_jl1pt, h_jl2pt, h_jb1pt, h_jb2pt
-          , h_j0b1pt, h_j0b2pt, h_j1b1pt, h_j1b2pt
-          , h_jl1eta, h_jl2eta, h_jb1eta, h_jb2eta
-          , h_j0b1eta, h_j0b2eta, h_j1b1eta, h_j1b2eta
-          , h_dphitb, h_detatb, h_drtb
-          , h_mbb, h_dphibb, h_drbb, h_ptbb, h_ht
-          };
+            , h_j0b1pt, h_j0b2pt, h_j1b1pt, h_j1b2pt
+            , h_jl1eta, h_jl2eta, h_jb1eta, h_jb2eta
+            , h_j0b1eta, h_j0b2eta, h_j1b1eta, h_j1b2eta
+            , h_dphitb, h_detatb, h_drtb
+            , h_mbb, h_dphibb, h_drbb, h_ptbb, h_ht
+        };
       }
 
     private:
@@ -268,7 +268,7 @@ namespace Rivet {
 
 
       shared_ptr<TTBBHist>
-          h_njl, h_njb, h_nj0b, h_nj1b
+        h_njl, h_njb, h_nj0b, h_nj1b
         , h_jl1pt, h_jl2pt, h_jb1pt, h_jb2pt
         , h_j0b1pt, h_j0b2pt, h_j1b1pt, h_j1b2pt
         , h_jl1eta, h_jl2eta, h_jb1eta, h_jb2eta
@@ -276,43 +276,67 @@ namespace Rivet {
         , h_dphitb, h_detatb, h_drtb
         , h_mbb, h_dphibb, h_drbb, h_ptbb, h_ht;
 
-    };
+  };
 
 
 
   class MCTTBB3 : public Analysis {
-  public:
+    public:
 
-    DEFAULT_RIVET_ANALYSIS_CTOR(MCTTBB3);
+      DEFAULT_RIVET_ANALYSIS_CTOR(MCTTBB3);
 
-    void init() {
-      FinalState fps(Cuts::abseta < 5 && Cuts::abspid != 6);
-      declare(FinalState(Cuts::abspid==6), "Tops");
+      void init() {
+        FinalState fps(Cuts::abseta < 5 && Cuts::abspid != 6);
+        declare(FinalState(Cuts::abspid==6), "Tops");
 
-      declare(FastJets(fps, FastJets::ANTIKT, 0.4), "Jets");
+        declare(FastJets(fps, FastJets::ANTIKT, 0.4), "Jets");
 
-      h_inclusive = TTBBHists("inclusive");
-      h_zerob = TTBBHists("zerob");
-      h_atleastoneb = TTBBHists("atleastoneb");
-      h_onej1b = TTBBHists("onej1b");
-      h_twoj1b = TTBBHists("twoj1b");
-      h_atleasttwoj1b = TTBBHists("atleasttwoj1b");
-      h_threej1b = TTBBHists("threej1b");
-      h_fourj1b = TTBBHists("fourj1b");
-      h_onej0b = TTBBHists("onej0b");
-      h_mbbgt100 = TTBBHists("mbbgt100");
+        h_inclusive = TTBBHists("inclusive");
+        h_inclusive_j15 = TTBBHists("inclusive_j15");
+        h_inclusive_j30 = TTBBHists("inclusive_j30");
+        h_inclusive_j40 = TTBBHists("inclusive_j40");
 
-    }
+        h_zerob = TTBBHists("zerob");
+        h_atleastoneb = TTBBHists("atleastoneb");
+        h_onej1b = TTBBHists("onej1b");
+        h_twoj1b = TTBBHists("twoj1b");
+        h_atleasttwoj1b = TTBBHists("atleasttwoj1b");
+        h_threej1b = TTBBHists("threej1b");
+        h_fourj1b = TTBBHists("fourj1b");
+        h_onej0b = TTBBHists("onej0b");
+        h_mbbgt100 = TTBBHists("mbbgt100");
+
+      }
 
 
-    void analyze(const Event& event) {
+      void analyze(const Event& event) {
 
-      double weight = event.weight();
+        double weight = event.weight();
 
-      const Jets& jets =
-      apply<FastJets>(event, "Jets").jetsByPt(
-        Cuts::pT > 25*GeV && Cuts::abseta < 2.5);
         const Particles& tquarks = apply<FinalState>(event, "Tops").particles();
+
+        const Jets& jets =
+          apply<FastJets>(event, "Jets").jetsByPt(
+              Cuts::pT > 25*GeV && Cuts::abseta < 2.5);
+
+        const Jets& jets15 =
+          apply<FastJets>(event, "Jets").jetsByPt(
+              Cuts::pT > 15*GeV && Cuts::abseta < 2.5);
+
+        const Jets& jets30 =
+          apply<FastJets>(event, "Jets").jetsByPt(
+              Cuts::pT > 30*GeV && Cuts::abseta < 2.5);
+
+        const Jets& jets40 =
+          apply<FastJets>(event, "Jets").jetsByPt(
+              Cuts::pT > 40*GeV && Cuts::abseta < 2.5);
+
+
+
+        vector<Jets> j25cats = jet_categories(jets);
+        vector<Jets> j15cats = jet_categories(jets15);
+        vector<Jets> j30cats = jet_categories(jets30);
+        vector<Jets> j40cats = jet_categories(jets40);
 
         // find the light, b, and B jets by checking the number of b-quark
         // constituents in the jet.
@@ -322,30 +346,14 @@ namespace Rivet {
         //        anti-b-quark for each b-quark
         // j1bs = jets with an imbalance between b-quarks and anti-b-quarks
 
-        Jets jls, jbs, j0bs, j1bs;
-        for (const Jet& j: jets) {
+        Jets jls = j25cats[0];
+        Jets jbs = j25cats[1];
+        Jets j0bs = j25cats[2];
+        Jets j1bs = j25cats[3];
 
-          size_t absnbs = 0;
-          int nbs = 0;
-          for (const Particle& c: j.constituents()) {
-            int thispid = pid(c);
-            if (abs(thispid) == 5) {
-              absnbs++;
-
-              if (thispid > 0) nbs++;
-
-              else nbs--;
-            }
-          }
-
-          if (absnbs == 0) jls.push_back(j);
-
-          else {
-            jbs.push_back(j);
-            if (nbs == 0) j0bs.push_back(j);
-            else j1bs.push_back(j);
-          }
-        }
+        h_inclusive_j15.fill(weight, j15cats[0], j15cats[1], j15cats[2], j15cats[3], tquarks);
+        h_inclusive_j30.fill(weight, j30cats[0], j30cats[1], j30cats[2], j30cats[3], tquarks);
+        h_inclusive_j40.fill(weight, j40cats[0], j40cats[1], j40cats[2], j40cats[3], tquarks);
 
         // inclusive selection
         h_inclusive.fill(weight, jls, jbs, j0bs, j1bs, tquarks);
@@ -388,16 +396,14 @@ namespace Rivet {
 
         if ((b1+b2).mass() > 100*GeV) h_mbbgt100.fill(weight, jls, jbs, j0bs, j1bs, tquarks);
 
-
         return;
       }
-
 
       void finalize() {
         vector<TTBBHists> hists =
         { h_inclusive, h_zerob, h_atleastoneb, h_onej0b
           , h_onej1b, h_twoj1b, h_atleasttwoj1b, h_threej1b
-          , h_fourj1b, h_mbbgt100
+            , h_fourj1b, h_mbbgt100
         };
 
         for (TTBBHists& ttbbhists: hists) {
@@ -418,19 +424,50 @@ namespace Rivet {
             addAnalysisObject(pos);
 
             /*
-            Scatter2DPtr ps = ttbbhist->posfrac();
-            ps->setPath(histoDir() + ps->path());
-            addAnalysisObject(ps);
-            */
+               Scatter2DPtr ps = ttbbhist->posfrac();
+               ps->setPath(histoDir() + ps->path());
+               addAnalysisObject(ps);
+               */
           }
         }
       }
 
     private:
-      TTBBHists h_inclusive, h_zerob, h_atleastoneb, h_onej1b, h_twoj1b, h_atleasttwoj1b, h_threej1b, h_fourj1b, h_onej0b, h_mbbgt100;
+      TTBBHists h_inclusive, h_inclusive_j15, h_inclusive_j30, h_inclusive_j40,
+                h_zerob, h_atleastoneb, h_onej1b, h_twoj1b, h_atleasttwoj1b, h_threej1b, h_fourj1b, h_onej0b, h_mbbgt100;
 
-    };
+      vector<Jets> jet_categories(const Jets& jets) {
+        Jets jls, jbs, j0bs, j1bs;
+        for (const Jet& j: jets) {
 
-    DECLARE_RIVET_PLUGIN(MCTTBB3);
+          size_t absnbs = 0;
+          int nbs = 0;
+          for (const Particle& c: j.constituents()) {
+            int thispid = pid(c);
+            if (abs(thispid) == 5) {
+              absnbs++;
 
-  }
+              if (thispid > 0) nbs++;
+
+              else nbs--;
+            }
+          }
+
+          if (absnbs == 0) jls.push_back(j);
+
+          else {
+            jbs.push_back(j);
+            if (nbs == 0) j0bs.push_back(j);
+            else j1bs.push_back(j);
+          }
+        }
+
+        return {jls, jbs, j0bs, j1bs};
+      }
+
+
+  };
+
+  DECLARE_RIVET_PLUGIN(MCTTBB3);
+
+}
