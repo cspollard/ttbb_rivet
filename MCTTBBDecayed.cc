@@ -144,7 +144,6 @@ namespace Rivet {
             , h_jl1eta, h_jl2eta, h_jb1eta, h_jb2eta
             , h_j2b1eta, h_j2b2eta, h_j1b1eta, h_j1b2eta
             , h_lep1eta, h_lep2eta, h_lep1pt, h_lep2pt
-            , h_dphitb, h_detatb, h_drtb
             , h_mbb, h_dphibb, h_drbb, h_ptbb, h_ht
         };
       }
@@ -162,7 +161,6 @@ namespace Rivet {
         , h_jl1eta, h_jl2eta, h_jb1eta, h_jb2eta
         , h_j2b1eta, h_j2b2eta, h_j1b1eta, h_j1b2eta
         , h_lep1eta, h_lep2eta, h_lep1pt, h_lep2pt
-        , h_dphitb, h_detatb, h_drtb
         , h_mbb, h_dphibb, h_drbb, h_ptbb, h_ht;
 
   };
