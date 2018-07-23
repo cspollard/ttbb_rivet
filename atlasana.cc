@@ -9,10 +9,10 @@
 namespace Rivet {
 
 
-  class testAnalysis : public Analysis {
+  class ATLAS_XX : public Analysis {
   public:
 
-    DEFAULT_RIVET_ANA_CONSTRUCTOR(testAnalysis);
+    DEFAULT_RIVET_ANA_CONSTRUCTOR(ATLAS_XX);
 
     void init() {
       // Eta ranges
@@ -383,6 +383,6 @@ namespace Rivet {
   
 
   // The hook for the plugin system
-  DECLARE_RIVET_PLUGIN(testAnalysis);
+  DECLARE_RIVET_PLUGIN(ATLAS_XX);
 
 }
