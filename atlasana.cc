@@ -9,10 +9,10 @@
 namespace Rivet {
 
 
-  class ATLAS_XX : public Analysis {
+  class testAnalysis : public Analysis {
   public:
 
-    DEFAULT_RIVET_ANA_CONSTRUCTOR(ATLAS_XX);
+    DEFAULT_RIVET_ANA_CONSTRUCTOR(testAnalysis);
 
     void init() {
       // Eta ranges
@@ -112,24 +112,24 @@ namespace Rivet {
 
 
       _hmbb_SL                       = bookHisto1D( "mbb_SL", bin_mbb_SL);
-      _hpt_leadingBJet_SL            = bookHisto1D("leadBjetpt_SL", bin_ptlead_SL);
-      _heta_leadingBJet_SL           = bookHisto1D( "leadBjeteta_SL", 5 , 0, 2.5);
-      _hpt_2ndleadingBJet_SL         = bookHisto1D( "secondleadingBJetpt_SL", bin_ptsublead_SL);
-      _heta_2ndleadingBJet_SL        = bookHisto1D( "secondleadingBJeteta_SL",5 ,0 ,2.5 );
-      _hnjets_SL                     = bookHisto1D( "njets_SL",6 ,2 ,8);
-      _hnbjets_SL                    = bookHisto1D( "nbjets_SL",6 ,2 ,8);
-      _hptbb_SL                      = bookHisto1D( "ptbb_SL", bin_ptbb_SL);
-      _hmbb_close_SL                 = bookHisto1D( "mbbclose_SL", bin_mbbclosest_SL);
-      _hptbb_close_SL                = bookHisto1D( "ptbbclose_SL", bin_ptbbclosest_SL);
-      _hdrbb_close_SL                = bookHisto1D( "drbbclose_SL", bin_drbbclosest_SL);
-      _hdrbb_SL                      = bookHisto1D( "drbb_SL", bin_drbb_SL);
-      _hpt_3rdleadingBJet_SL         = bookHisto1D( "thirdleadingBJetpt_SL", bin_pt3rdjet_SL);
-      _heta_3rdleadingBJet_SL        = bookHisto1D( "thirdleadingBJeteta_SL",5 ,0, 2.5);
+      _hpt_leadingBJet_SL            = bookHisto1D("leadBjetpt_SL", bin_ptlead_SL);                                                                                                       
+      _heta_leadingBJet_SL           = bookHisto1D( "leadBjeteta_SL", 5 , 0, 2.5);                                                                                                                      
+      _hpt_2ndleadingBJet_SL         = bookHisto1D( "secondleadingBJetpt_SL", bin_ptsublead_SL);                                                                                                        
+      _heta_2ndleadingBJet_SL        = bookHisto1D( "secondleadingBJeteta_SL",5 ,0 ,2.5 );                                                                                                       
+      _hnjets_SL                     = bookHisto1D( "njets_SL",6 ,2 ,8);                                                                                                                     
+      _hnbjets_SL                    = bookHisto1D( "nbjets_SL",6 ,2 ,8);                                                                                                               
+      _hptbb_SL                      = bookHisto1D( "ptbb_SL", bin_ptbb_SL);                                                                                                                   
+      _hmbb_close_SL                 = bookHisto1D( "mbbclose_SL", bin_mbbclosest_SL);                                                                                                        
+      _hptbb_close_SL                = bookHisto1D( "ptbbclose_SL", bin_ptbbclosest_SL);                                                                                                      
+      _hdrbb_close_SL                = bookHisto1D( "drbbclose_SL", bin_drbbclosest_SL);                                                                                                            
+      _hdrbb_SL                      = bookHisto1D( "drbb_SL", bin_drbb_SL);                                                                                                                  
+      _hpt_3rdleadingBJet_SL         = bookHisto1D( "thirdleadingBJetpt_SL", bin_pt3rdjet_SL);                                                                                                      
+      _heta_3rdleadingBJet_SL        = bookHisto1D( "thirdleadingBJeteta_SL",5 ,0, 2.5);                                                                                                               
       _hpt_4thleadingBJet_SL         = bookHisto1D( "fourthleadingBJetpt_SL", bin_pt4thjet_SL);
-      _hHT_SL                        = bookHisto1D( "HT_SL", bin_ht_SL);
-      _hHTHAD_SL                     = bookHisto1D( "HTHAD_SL", bin_hthad_SL);
+      _hHT_SL                        = bookHisto1D( "HT_SL", bin_ht_SL);       
+      _hHTHAD_SL                     = bookHisto1D( "HTHAD_SL", bin_hthad_SL);      
       _hHTB_SL                       = bookHisto1D( "HTB_SL", bin_htb_SL);
-      _hpt_leadingLightJet_SL        = bookHisto1D( "leadingLightJetpt_SL", bin_ptlightjet_SL);
+      _hpt_leadingLightJet_SL        = bookHisto1D( "leadingLightJetpt_SL", bin_ptlightjet_SL);      
 
 
       _hmbb_DIL                      = bookHisto1D( "mbb_DIL", bin_mbb_DIL);
@@ -155,6 +155,7 @@ namespace Rivet {
 
     void analyze(const Event& event) {
       iEvent++;
+      std::cout << iEvent << std::endl;
       vector<DressedLepton> electrons = applyProjection<DressedLeptons>(event, "DressedElectrons25").dressedLeptons();
       vector<DressedLepton> muons     = applyProjection<DressedLeptons>(event, "DressedMuons25").dressedLeptons();
       weight = event.weight();
@@ -168,18 +169,18 @@ namespace Rivet {
       doOR(jets,muons,kept_muons25,kept_muons27);
       fillJets(jets);
       // Evaluate basic event selection
-
+	
 
       bool no25 = kept_muons25.size() > 0 || kept_electrons25.size() > 0;
       bool passSL = ((kept_electrons27.size() == 1 && kept_muons27.size() == 0) || (kept_electrons27.size() == 0 && kept_muons27.size() == 1)) && !no25;
-      bool pass_emu = kept_electrons27.size() == 1 && kept_muons27.size() == 1 && !no25;
+      bool pass_emu = kept_electrons27.size() == 1 && kept_muons27.size() == 1 && !no25;	
       //      if(njets >= 2 && nbjets >= 2 && pass_emu)      std::cout << njets << " "<< nbjets << " " << kept_muons27.size() << " " <<kept_electrons27.size() <<" " << kept_electrons27[0].pT()*1000 <<" "<< kept_electrons27[0].eta()  << " " <<kept_muons27[0].pT()*1000 <<" "<< kept_muons27[0].eta() << endl;
       //   else cout << " " << endl;
 
       DressedLepton *lepton0 = kept_muons27.empty() ? &kept_electrons27[0] : &kept_muons27[0];
       DressedLepton *lepton1 = NULL;
       if(!pass_emu && !passSL) vetoEvent;
-
+      
 
 
       if(pass_emu) {
@@ -208,7 +209,7 @@ namespace Rivet {
       hthad = sum(jets,pT,0.0);
       htb = sum(bjets,pT,0.0);
       ht += hthad;
-
+     
       bjet0 = bjets[0].momentum();
       bjet1 = bjets[1].momentum();
       bjet2 = bjets[2].momentum();
@@ -221,24 +222,14 @@ namespace Rivet {
 
 
       void finalize() {
-	       vector<Histo1DPtr> hists =
-          { _hpt_leadingBJet_SL, _hpt_2ndleadingBJet_SL, _hmbb_SL, _hptbb_SL
-          , _hpt_leadingBJet_DIL, _hpt_2ndleadingBJet_DIL, _hmbb_DIL, _hptbb_DIL
-          , _hptbb_close_SL, _hmbb_close_SL, _hdrbb_close_SL, _hptbb_close_DIL
-          , _hmbb_close_DIL, _hdrbb_close_DIL, _hdrbb_SL, _hdrbb_DIL
-          , _heta_3rdleadingBJet_SL, _heta_3rdleadingBJet_DIL
-          , _hpt_3rdleadingBJet_SL , _hpt_3rdleadingBJet_DIL
-          , _heta_leadingBJet_SL , _heta_2ndleadingBJet_SL
-          , _heta_leadingBJet_DIL, _heta_2ndleadingBJet_DIL, _hHT_DIL, _hHT_SL
-          , _hHTHAD_DIL, _hHTHAD_SL, _hpt_4thleadingBJet_SL
-          , _hpt_4thleadingBJet_DIL, _hpt_leadingLightJet_SL, _hHTB_SL
-          , _hnjets_SL, _hnbjets_SL , _hnjets_DIL, _hnbjets_DIL
-          };
-
-        for (Histo1DPtr& h: hists)
-          scale(h, crossSection()/sumOfWeights());
-
-        return;
+	normalize({_hpt_leadingBJet_SL, _hpt_2ndleadingBJet_SL, _hmbb_SL, _hptbb_SL,
+	      _hpt_leadingBJet_DIL, _hpt_2ndleadingBJet_DIL, _hmbb_DIL, _hptbb_DIL,
+	      _hptbb_close_SL, _hmbb_close_SL, _hdrbb_close_SL, _hptbb_close_DIL, _hmbb_close_DIL, _hdrbb_close_DIL,
+	      _hdrbb_SL, _hdrbb_DIL, _heta_3rdleadingBJet_SL , _heta_3rdleadingBJet_DIL , _hpt_3rdleadingBJet_SL , _hpt_3rdleadingBJet_DIL,
+	      _heta_leadingBJet_SL , _heta_2ndleadingBJet_SL, _heta_leadingBJet_DIL, _heta_2ndleadingBJet_DIL,
+	      _hHT_DIL, _hHT_SL, _hHTHAD_DIL, _hHTHAD_SL, _hpt_4thleadingBJet_SL, _hpt_4thleadingBJet_DIL,
+	      _hpt_leadingLightJet_SL, _hHTB_SL},1);
+	      
       }
 
 
@@ -295,7 +286,7 @@ namespace Rivet {
     std::vector<double> bin_mbbclosest_DIL;
     std::vector<double> bin_ptbbclosest_DIL;
     std::vector<double> bin_drbbclosest_DIL;
-
+    
     void variableClear() {
       lightjets.clear();
       bjets.clear();
@@ -322,7 +313,7 @@ namespace Rivet {
         }
       }
     }
-
+    
     void doOR(const Jets jets,vector<DressedLepton> & initial_Lepton, vector<DressedLepton> & saved_Lepton, vector<DressedLepton> & saved_Lepton2){
       foreach (DressedLepton& leptons,initial_Lepton) {
 	bool dRPass = true;
@@ -335,7 +326,7 @@ namespace Rivet {
 	if(dRPass && leptons.pT()*GeV >= 27) saved_Lepton2.push_back(leptons);
       }
     }
-
+    
     void fillSLHists(){
       double drbb = deltaR(bjet0,bjet1);
       if(lightjets.size() > 0) _hpt_leadingLightJet_SL->fill(lightjets[0].pT()*GeV,weight);
@@ -373,17 +364,12 @@ namespace Rivet {
       _hmbb_close_DIL->fill(mbbclose*GeV,weight);
       _hdrbb_close_DIL->fill(mindrOld,weight);
       if(nbjets >= 4) _hpt_4thleadingBJet_DIL->fill(bjet3.pT()*GeV,weight);
-    }
-
+    }    
+    
     void fillJets(const Jets& jets){
       foreach (const Jet& jet, jets){
         njets++;
-        size_t nbs = 0;
-        for (const Particle& c: jet.constituents()) {
-          if (abspid(c) == 5)
-            nbs++;
-        }
-        bool isBtagged = nbs > 0;
+        bool isBtagged = jet.bTagged(Cuts::pT >= 5.0*GeV);
         if(!isBtagged) lightjets += jet;
         if(isBtagged){
           bjets += jet;
@@ -391,12 +377,12 @@ namespace Rivet {
 	}
       }
     }
-
-
+    
+    
   };
-
+  
 
   // The hook for the plugin system
-  DECLARE_RIVET_PLUGIN(ATLAS_XX);
+  DECLARE_RIVET_PLUGIN(testAnalysis);
 
 }
