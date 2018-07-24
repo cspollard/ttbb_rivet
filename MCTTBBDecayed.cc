@@ -18,7 +18,7 @@ namespace Rivet {
 
       TTBBDecayedHists(const string& prefix) {
         h_njl = make_shared<TTBBHist>("h_" + prefix + "_njl", 10, 0, 10, "", "light-jet multiplicity", dsdx("n", "1"));
-        h_njb = make_shared<TTBBHist>("h_" + prefix + "_njb", 5, 0, 5, "", "$b$-jet mulitplicity", dsdx("n", "1"));
+        h_njb = make_shared<TTBBHist>("h_" + prefix + "_njb", 8, 0, 8, "", "$b$-jet mulitplicity", dsdx("n", "1"));
         h_nj2b = make_shared<TTBBHist>("h_" + prefix + "_nj2b", 5, 0, 5, "", "$bb$-jet multiplicity", dsdx("n", "1"));
         h_nj1b = make_shared<TTBBHist>("h_" + prefix + "_nj1b", 5, 0, 5, "", "$b1$-jet multiplicity", dsdx("n", "1"));
 
