@@ -46,6 +46,9 @@ namespace Rivet {
         h_lep2eta = make_shared<TTBBHist>("h_" + prefix + "_lep2eta", 30, -3, 3, "", "subleading lepton " + seta, dsdx(seta, "\\mathrm{GeV}"));
 
         h_mbb = make_shared<TTBBHist>("h_" + prefix + "_mbb", 50, 0, 500*GeV, "", smbb + " [GeV]", dsdx(smbb, "\\mathrm{GeV}"));
+        h_mbb_avg = make_shared<TTBBHist>("h_" + prefix + "_mbb_avg", 50, 0, 500*GeV, "", "average " + smbb + " [GeV]", dsdx(smbb, "\\mathrm{GeV}"));
+        h_mbb_wind = make_shared<TTBBHist>("h_" + prefix + "_mbb_wind", 5, 0, 5, "", "number of " + smbb + " combinations in (100, 150) GeV", dsdx("n", "1"));
+
         h_dphibb = make_shared<TTBBHist>("h_" + prefix + "_dphibb", 50, 0, 4, "", sdphibb, dsdx(sdphibb, "1"));
         h_drbb = make_shared<TTBBHist>("h_" + prefix + "_drbb", 50, 0, 5, "", sdrbb, dsdx(sdrbb, "1"));
         h_ptbb = make_shared<TTBBHist>("h_" + prefix + "_ptbb", 50, 0, 500*GeV, "", sptbb + " [GeV]", dsdx(sptbb, "\\mathrm{GeV}"));
@@ -132,6 +135,22 @@ namespace Rivet {
         h_drbb->fill(deltaR(b1, b2), weight);
         h_ptbb->fill((b1 + b2).pt(), weight);
 
+        size_t ncomb = jbs.size()*(jbs.size() - 1);
+        size_t nwind = 0;
+        double mbbsum = 0;
+        for (size_t ib = 0; ib < jbs.size(); ib++) {
+          for (size_t jb = ib+1; jb < jbs.size(); jb++) {
+            double mbb = (jbs[ib].mom() + jbs[jb].mom()).mass();
+            mbbsum += mbb;
+
+            if (100*GeV < mbb && mbb < 150*GeV)
+              nwind++;
+          }
+        }
+
+        h_mbb_avg->fill(mbbsum/ncomb, weight);
+        h_mbb_wind->fill(nwind, weight);
+
       };
 
       // this has to be a vector<Histo1DPtr> rather than vector<Histo1D> because
@@ -144,7 +163,8 @@ namespace Rivet {
             , h_jl1eta, h_jl2eta, h_jb1eta, h_jb2eta
             , h_j2b1eta, h_j2b2eta, h_j1b1eta, h_j1b2eta
             , h_lep1eta, h_lep2eta, h_lep1pt, h_lep2pt
-            , h_mbb, h_dphibb, h_drbb, h_ptbb, h_ht
+            , h_mbb, h_mbb_avg, h_mbb_wind
+            , h_dphibb, h_drbb, h_ptbb, h_ht
         };
       }
 
@@ -161,7 +181,8 @@ namespace Rivet {
         , h_jl1eta, h_jl2eta, h_jb1eta, h_jb2eta
         , h_j2b1eta, h_j2b2eta, h_j1b1eta, h_j1b2eta
         , h_lep1eta, h_lep2eta, h_lep1pt, h_lep2pt
-        , h_mbb, h_dphibb, h_drbb, h_ptbb, h_ht;
+        , h_mbb, h_mbb_avg, h_mbb_wind
+        , h_dphibb, h_drbb, h_ptbb, h_ht;
 
   };
 
