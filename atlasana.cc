@@ -277,8 +277,12 @@ class ATLAS_XX : public Analysis {
 
   void finalize() {
     // Normalise all histograms to cross section
-    for (auto const& h : _histograms) {
-      scale(h, crossSection()/picobarn/sumOfWeights());
+    for (const auto& h : _histograms) {
+      scale(h.second, crossSection()/picobarn/sumOfWeights());
+    }
+
+    for (const auto& c : _counters) {
+      scale(c.second, crossSection()/picobarn/sumOfWeights());
     }
   }
 

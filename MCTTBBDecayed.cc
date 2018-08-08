@@ -24,12 +24,21 @@ namespace Rivet {
 
         h_jl1pt = make_shared<TTBBHist>("h_" + prefix + "_jl1pt", 50, 0, 500*GeV, "", "leading light-jet " + spt + " [GeV]", dsdx(spt, "\\mathrm{GeV}"));
         h_jl2pt = make_shared<TTBBHist>("h_" + prefix + "_jl2pt", 50, 0, 500*GeV, "", "subleading light-jet " + spt + " [GeV]", dsdx(spt, "\\mathrm{GeV}"));
+
         h_jb1pt = make_shared<TTBBHist>("h_" + prefix + "_jb1pt", 50, 0, 500*GeV, "", "leading $b$-jet " + spt + " [GeV]", dsdx(spt, "\\mathrm{GeV}"));
         h_jb2pt = make_shared<TTBBHist>("h_" + prefix + "_jb2pt", 50, 0, 500*GeV, "", "subleading $b$-jet " + spt + " [GeV]", dsdx(spt, "\\mathrm{GeV}"));
+        h_jb3pt = make_shared<TTBBHist>("h_" + prefix + "_jb3pt", 50, 0, 500*GeV, "", "3rd $b$-jet " + spt + " [GeV]", dsdx(spt, "\\mathrm{GeV}"));
+        h_jb4pt = make_shared<TTBBHist>("h_" + prefix + "_jb4pt", 50, 0, 500*GeV, "", "4th $b$-jet " + spt + " [GeV]", dsdx(spt, "\\mathrm{GeV}"));
+
         h_j2b1pt = make_shared<TTBBHist>("h_" + prefix + "_j2b1pt", 50, 0, 500*GeV, "", "leading $bb$-jet " + spt + " [GeV]", dsdx(spt, "\\mathrm{GeV}"));
         h_j2b2pt = make_shared<TTBBHist>("h_" + prefix + "_j2b2pt", 50, 0, 500*GeV, "", "subleading $bb$-jet " + spt + " [GeV]", dsdx(spt, "\\mathrm{GeV}"));
+        h_j2b3pt = make_shared<TTBBHist>("h_" + prefix + "_j2b3pt", 50, 0, 500*GeV, "", "3rd $bb$-jet " + spt + " [GeV]", dsdx(spt, "\\mathrm{GeV}"));
+        h_j2b4pt = make_shared<TTBBHist>("h_" + prefix + "_j2b4pt", 50, 0, 500*GeV, "", "4th $bb$-jet " + spt + " [GeV]", dsdx(spt, "\\mathrm{GeV}"));
+
         h_j1b1pt = make_shared<TTBBHist>("h_" + prefix + "_j1b1pt", 50, 0, 500*GeV, "", "leading $b1$-jet " + spt + " [GeV]", dsdx(spt, "\\mathrm{GeV}"));
         h_j1b2pt = make_shared<TTBBHist>("h_" + prefix + "_j1b2pt", 50, 0, 500*GeV, "", "subleading $b1$-jet " + spt + " [GeV]", dsdx(spt, "\\mathrm{GeV}"));
+        h_j1b3pt = make_shared<TTBBHist>("h_" + prefix + "_j1b3pt", 50, 0, 500*GeV, "", "3rd $b1$-jet " + spt + " [GeV]", dsdx(spt, "\\mathrm{GeV}"));
+        h_j1b4pt = make_shared<TTBBHist>("h_" + prefix + "_j1b4pt", 50, 0, 500*GeV, "", "4th $b1$-jet " + spt + " [GeV]", dsdx(spt, "\\mathrm{GeV}"));
 
         h_jl1eta = make_shared<TTBBHist>("h_" + prefix + "_jl1eta", 30, -3, 3, "", "leading light-jet " + seta, dsdx(seta, "\\mathrm{GeV}"));
         h_jl2eta = make_shared<TTBBHist>("h_" + prefix + "_jl2eta", 30, -3, 3, "", "subleading light-jet " + seta, dsdx(seta, "\\mathrm{GeV}"));
@@ -82,6 +91,14 @@ namespace Rivet {
           h_jb2eta->fill(jbs[1].eta(), weight);
         }
 
+        if (jbs.size() >= 3) {
+          h_jb3pt->fill(jbs[2].pt(), weight);
+        }
+
+        if (jbs.size() >= 4) {
+          h_jb4pt->fill(jbs[3].pt(), weight);
+        }
+
         if (j2bs.size() >= 1) {
           h_j2b1pt->fill(j2bs[0].pt(), weight);
           h_j2b1eta->fill(j2bs[0].eta(), weight);
@@ -92,6 +109,14 @@ namespace Rivet {
           h_j2b2eta->fill(j2bs[1].eta(), weight);
         }
 
+        if (j2bs.size() >= 3) {
+          h_j2b3pt->fill(j2bs[2].pt(), weight);
+        }
+
+        if (j2bs.size() >= 4) {
+          h_j2b4pt->fill(j2bs[3].pt(), weight);
+        }
+
         if (j1bs.size() >= 1) {
           h_j1b1pt->fill(j1bs[0].pt(), weight);
           h_j1b1eta->fill(j1bs[0].eta(), weight);
@@ -100,6 +125,14 @@ namespace Rivet {
         if (j1bs.size() >= 2) {
           h_j1b2pt->fill(j1bs[1].pt(), weight);
           h_j1b2eta->fill(j1bs[1].eta(), weight);
+        }
+
+        if (j1bs.size() >= 3) {
+          h_j1b3pt->fill(j1bs[2].pt(), weight);
+        }
+
+        if (j1bs.size() >= 4) {
+          h_j1b4pt->fill(j1bs[3].pt(), weight);
         }
 
         if (leps.size() >= 1) {
@@ -158,13 +191,15 @@ namespace Rivet {
       vector<shared_ptr<TTBBHist>> histograms() {
         return
         { h_njl, h_njb, h_nj2b, h_nj1b
-          , h_jl1pt, h_jl2pt, h_jb1pt, h_jb2pt
-            , h_j2b1pt, h_j2b2pt, h_j1b1pt, h_j1b2pt
-            , h_jl1eta, h_jl2eta, h_jb1eta, h_jb2eta
-            , h_j2b1eta, h_j2b2eta, h_j1b1eta, h_j1b2eta
-            , h_lep1eta, h_lep2eta, h_lep1pt, h_lep2pt
-            , h_mbb, h_mbb_avg, h_mbb_wind
-            , h_dphibb, h_drbb, h_ptbb, h_ht
+          , h_jl1pt, h_jl2pt
+          , h_jb1pt, h_jb2pt, h_jb3pt, h_jb4pt
+          , h_j2b1pt, h_j2b2pt, h_j2b3pt, h_j2b4pt
+          , h_j1b1pt, h_j1b2pt, h_j1b3pt, h_j1b4pt
+          , h_jl1eta, h_jl2eta, h_jb1eta, h_jb2eta
+          , h_j2b1eta, h_j2b2eta, h_j1b1eta, h_j1b2eta
+          , h_lep1eta, h_lep2eta, h_lep1pt, h_lep2pt
+          , h_mbb, h_mbb_avg, h_mbb_wind
+          , h_dphibb, h_drbb, h_ptbb, h_ht
         };
       }
 
@@ -176,8 +211,10 @@ namespace Rivet {
 
       shared_ptr<TTBBHist>
         h_njl, h_njb, h_nj2b, h_nj1b
-        , h_jl1pt, h_jl2pt, h_jb1pt, h_jb2pt
-        , h_j2b1pt, h_j2b2pt, h_j1b1pt, h_j1b2pt
+        , h_jl1pt, h_jl2pt
+        , h_jb1pt, h_jb2pt, h_jb3pt, h_jb4pt
+        , h_j2b1pt, h_j2b2pt, h_j2b3pt, h_j2b4pt
+        , h_j1b1pt, h_j1b2pt, h_j1b3pt, h_j1b4pt
         , h_jl1eta, h_jl2eta, h_jb1eta, h_jb2eta
         , h_j2b1eta, h_j2b2eta, h_j1b1eta, h_j1b2eta
         , h_lep1eta, h_lep2eta, h_lep1pt, h_lep2pt
