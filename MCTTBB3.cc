@@ -20,6 +20,14 @@ namespace Rivet {
         h_nj0b = make_shared<TTBBHist>("h_" + prefix + "_nj0b", 5, -0.5, 4.5, "", "$bb$-jet multiplicity", dsdx("n", "1"));
         h_nj1b = make_shared<TTBBHist>("h_" + prefix + "_nj1b", 5, -0.5, 4.5, "", "$b1$-jet multiplicity", dsdx("n", "1"));
 
+        p_fracj1b = make_shared<Profile1D>(7, 0.5, 7.5, "p_" + prefix + "_fracj1b", "");
+        p_fracj1b->setAnnotation("XTitle", "$b1$-jet fraction");
+        p_fracj1b->setAnnotation("YTitle", dsdx("frac", "1"));
+
+        p_fracj0b = make_shared<Profile1D>(7, 0.5, 7.5, "p_" + prefix + "_fracj0b", "");
+        p_fracj0b->setAnnotation("XTitle", "$bb$-jet fraction");
+        p_fracj0b->setAnnotation("YTitle", dsdx("frac", "1"));
+
         h_jl1pt = make_shared<TTBBHist>("h_" + prefix + "_jl1pt", 50, 0, 500*GeV, "", "leading light-jet " + spt + " [GeV]", dsdx(spt, "\\mathrm{GeV}"));
         h_jl2pt = make_shared<TTBBHist>("h_" + prefix + "_jl2pt", 50, 0, 500*GeV, "", "subleading light-jet " + spt + " [GeV]", dsdx(spt, "\\mathrm{GeV}"));
         h_jb1pt = make_shared<TTBBHist>("h_" + prefix + "_jb1pt", 50, 0, 500*GeV, "", "leading $b$-jet " + spt + " [GeV]", dsdx(spt, "\\mathrm{GeV}"));
@@ -50,6 +58,8 @@ namespace Rivet {
       }
 
       void fill(double weight, const Jets& jls, const Jets& jbs, const Jets& j0bs, const Jets& j1bs, const Particles& tops) {
+        size_t njb = j0bs.size()+j1bs.size();
+
         h_njl->fill(jls.size(), weight);
         h_njb->fill(j0bs.size()+j1bs.size(), weight);
         h_nj0b->fill(j0bs.size(), weight);
@@ -68,6 +78,9 @@ namespace Rivet {
         if (jbs.size() >= 1) {
           h_jb1pt->fill(jbs[0].pt(), weight);
           h_jb1eta->fill(jbs[0].eta(), weight);
+
+          p_fracj0b->fill(njb, float(j0bs.size())/njb, weight);
+          p_fracj1b->fill(njb, float(j1bs.size())/njb, weight);
         }
 
         if (jbs.size() >= 2) {
@@ -168,6 +181,10 @@ namespace Rivet {
         };
       }
 
+      vector<Profile1DPtr> profiles() {
+        return { p_fracj1b, p_fracj0b };
+      }
+
     private:
       string dsdx(const string& x, const string& xunit) {
         return "\\ensuremath{\\frac{d\\sigma}{d" + x + "} \\frac{{pb}}{" + xunit + "}}";
@@ -182,6 +199,8 @@ namespace Rivet {
         , h_j0b1eta, h_j0b2eta, h_j1b1eta, h_j1b2eta
         , h_dphitb, h_detatb, h_drtb
         , h_mbb, h_dphibb, h_drbb, h_ptbb, h_ht;
+
+      Profile1DPtr p_fracj0b, p_fracj1b;
 
   };
 
@@ -331,18 +350,21 @@ namespace Rivet {
             scale(pos, crossSection()/picobarn/sumOfWeights());
             addAnalysisObject(pos);
 
-            /*
-               Scatter2DPtr ps = ttbbhist->posfrac();
-               ps->setPath(histoDir() + ps->path());
-               addAnalysisObject(ps);
-               */
           }
+
+          for (Profile1DPtr& ph: ttbbhists.profiles()) {
+            ph->setPath(histoDir() + ph->path());
+            ph->scaleW(crossSection()/picobarn/sumOfWeights());
+            addAnalysisObject(ph);
+          }
+
         }
       }
 
     private:
       TTBBHists h_inclusive, h_inclusive_j15, h_inclusive_j30, h_inclusive_j40,
-                h_zerob, h_atleastoneb, h_onej1b, h_twoj1b, h_atleasttwoj1b, h_threej1b, h_fourj1b, h_onej0b, h_mbbgt100;
+                h_zerob, h_atleastoneb, h_onej1b, h_twoj1b, h_atleasttwoj1b,
+                h_threej1b, h_fourj1b, h_onej0b, h_mbbgt100;
 
       vector<Jets> jet_categories(const Jets& jets) {
         Jets jls, jbs, j0bs, j1bs;
