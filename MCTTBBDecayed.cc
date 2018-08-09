@@ -3,13 +3,12 @@
 #include "Rivet/Projections/IdentifiedFinalState.hh"
 #include "Rivet/Projections/PromptFinalState.hh"
 #include "Rivet/Projections/DressedLeptons.hh"
+#include "Rivet/Projections/VetoedFinalState.hh"
 #include "Rivet/Projections/FastJets.hh"
 #include "Rivet/Projections/PartonicTops.hh"
 #include "TTBBHist.hh"
 
 namespace Rivet {
-
-
 
   class TTBBDecayedHists {
     public:
@@ -242,8 +241,10 @@ namespace Rivet {
           , Cuts::abseta < 2.5 && Cuts::pT > 25*GeV, true, true);
         declare(dressedleps, "Leptons");
 
+        VetoedFinalState jfs(fps);
+        jfs.addVetoOnThisFinalState(dressedleps);
 
-        declare(FastJets(fps, FastJets::ANTIKT, 0.4), "Jets");
+        declare(FastJets(jfs, FastJets::ANTIKT, 0.4), "Jets");
 
         h_onelep_inclusive = TTBBDecayedHists("onelep_inclusive");
         h_onelep_eq4j = TTBBDecayedHists("onelep_eq4j");
