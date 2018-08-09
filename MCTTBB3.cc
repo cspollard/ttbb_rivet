@@ -15,10 +15,10 @@ namespace Rivet {
       TTBBHists() { };
 
       TTBBHists(const string& prefix) {
-        h_njl = make_shared<TTBBHist>("h_" + prefix + "_njl", 10, 0, 10, "", "light-jet multiplicity", dsdx("n", "1"));
-        h_njb = make_shared<TTBBHist>("h_" + prefix + "_njb", 5, 0, 5, "", "$b$-jet mulitplicity", dsdx("n", "1"));
-        h_nj0b = make_shared<TTBBHist>("h_" + prefix + "_nj0b", 5, 0, 5, "", "$bb$-jet multiplicity", dsdx("n", "1"));
-        h_nj1b = make_shared<TTBBHist>("h_" + prefix + "_nj1b", 5, 0, 5, "", "$b1$-jet multiplicity", dsdx("n", "1"));
+        h_njl = make_shared<TTBBHist>("h_" + prefix + "_njl", 10, -0.5, 9.5, "", "light-jet multiplicity", dsdx("n", "1"));
+        h_njb = make_shared<TTBBHist>("h_" + prefix + "_njb", 5, -0.5, 4.5, "", "$b$-jet mulitplicity", dsdx("n", "1"));
+        h_nj0b = make_shared<TTBBHist>("h_" + prefix + "_nj0b", 5, -0.5, 4.5, "", "$bb$-jet multiplicity", dsdx("n", "1"));
+        h_nj1b = make_shared<TTBBHist>("h_" + prefix + "_nj1b", 5, -0.5, 4.5, "", "$b1$-jet multiplicity", dsdx("n", "1"));
 
         h_jl1pt = make_shared<TTBBHist>("h_" + prefix + "_jl1pt", 50, 0, 500*GeV, "", "leading light-jet " + spt + " [GeV]", dsdx(spt, "\\mathrm{GeV}"));
         h_jl2pt = make_shared<TTBBHist>("h_" + prefix + "_jl2pt", 50, 0, 500*GeV, "", "subleading light-jet " + spt + " [GeV]", dsdx(spt, "\\mathrm{GeV}"));

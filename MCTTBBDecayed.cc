@@ -16,10 +16,10 @@ namespace Rivet {
       TTBBDecayedHists() { };
 
       TTBBDecayedHists(const string& prefix) {
-        h_njl = make_shared<TTBBHist>("h_" + prefix + "_njl", 10, 0, 10, "", "light-jet multiplicity", dsdx("n", "1"));
-        h_njb = make_shared<TTBBHist>("h_" + prefix + "_njb", 8, 0, 8, "", "$b$-jet mulitplicity", dsdx("n", "1"));
-        h_nj2b = make_shared<TTBBHist>("h_" + prefix + "_nj2b", 5, 0, 5, "", "$bb$-jet multiplicity", dsdx("n", "1"));
-        h_nj1b = make_shared<TTBBHist>("h_" + prefix + "_nj1b", 5, 0, 5, "", "$b1$-jet multiplicity", dsdx("n", "1"));
+        h_njl = make_shared<TTBBHist>("h_" + prefix + "_njl", 10, -0.5, 9.5, "", "light-jet multiplicity", dsdx("n", "1"));
+        h_njb = make_shared<TTBBHist>("h_" + prefix + "_njb", 8, -0.5, 7.5, "", "$b$-jet mulitplicity", dsdx("n", "1"));
+        h_nj2b = make_shared<TTBBHist>("h_" + prefix + "_nj2b", 5,-0.5, 4.5, "", "$bb$-jet multiplicity", dsdx("n", "1"));
+        h_nj1b = make_shared<TTBBHist>("h_" + prefix + "_nj1b", 5, -0.5, 4.5, "", "$b1$-jet multiplicity", dsdx("n", "1"));
 
         h_jl1pt = make_shared<TTBBHist>("h_" + prefix + "_jl1pt", 50, 0, 500*GeV, "", "leading light-jet " + spt + " [GeV]", dsdx(spt, "\\mathrm{GeV}"));
         h_jl2pt = make_shared<TTBBHist>("h_" + prefix + "_jl2pt", 50, 0, 500*GeV, "", "subleading light-jet " + spt + " [GeV]", dsdx(spt, "\\mathrm{GeV}"));
@@ -55,7 +55,7 @@ namespace Rivet {
 
         h_mbb = make_shared<TTBBHist>("h_" + prefix + "_mbb", 50, 0, 500*GeV, "", smbb + " [GeV]", dsdx(smbb, "\\mathrm{GeV}"));
         h_mbb_avg = make_shared<TTBBHist>("h_" + prefix + "_mbb_avg", 50, 0, 500*GeV, "", "average " + smbb + " [GeV]", dsdx(smbb, "\\mathrm{GeV}"));
-        h_mbb_wind = make_shared<TTBBHist>("h_" + prefix + "_mbb_wind", 5, 0, 5, "", "number of " + smbb + " combinations in (100, 150) GeV", dsdx("n", "1"));
+        h_mbb_wind = make_shared<TTBBHist>("h_" + prefix + "_mbb_wind", 5, -0.5, 4.5, "", "number of " + smbb + " combinations in (100, 150) GeV", dsdx("n", "1"));
 
         h_dphibb = make_shared<TTBBHist>("h_" + prefix + "_dphibb", 50, 0, 4, "", sdphibb, dsdx(sdphibb, "1"));
         h_drbb = make_shared<TTBBHist>("h_" + prefix + "_drbb", 50, 0, 5, "", sdrbb, dsdx(sdrbb, "1"));
