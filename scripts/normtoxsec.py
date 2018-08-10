@@ -1,6 +1,9 @@
 """
 usage:
 $ python normtoxsec.py xsec infile.yoda outfile.yoda
+
+for instance:
+$ for f in *yoda; do python scripts/normtoxsec.py 830 $f ${f/yoda/scaled.yoda}; done
 """
 
 import yoda
