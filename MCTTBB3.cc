@@ -37,6 +37,15 @@ namespace Rivet {
         h_j1b1pt = make_shared<TTBBHist>("h_" + prefix + "_j1b1pt", 50, 0, 500*GeV, "", "leading $b1$-jet " + spt + " [GeV]", dsdx(spt, "\\mathrm{GeV}"));
         h_j1b2pt = make_shared<TTBBHist>("h_" + prefix + "_j1b2pt", 50, 0, 500*GeV, "", "subleading $b1$-jet " + spt + " [GeV]", dsdx(spt, "\\mathrm{GeV}"));
 
+        h_jl1pt_log = make_shared<TTBBHist>("h_" + prefix + "_jl1pt_log", logspace(50, 10, 1000*GeV), "", "leading light-jet " + spt + " [GeV]", dsdx(spt, "\\mathrm{GeV}"));
+        h_jl2pt_log = make_shared<TTBBHist>("h_" + prefix + "_jl2pt_log", logspace(50, 10, 1000*GeV), "", "subleading light-jet " + spt + " [GeV]", dsdx(spt, "\\mathrm{GeV}"));
+        h_jb1pt_log = make_shared<TTBBHist>("h_" + prefix + "_jb1pt_log", logspace(50, 10, 1000*GeV), "", "leading $b$-jet " + spt + " [GeV]", dsdx(spt, "\\mathrm{GeV}"));
+        h_jb2pt_log = make_shared<TTBBHist>("h_" + prefix + "_jb2pt_log", logspace(50, 10, 1000*GeV), "", "subleading $b$-jet " + spt + " [GeV]", dsdx(spt, "\\mathrm{GeV}"));
+        h_j0b1pt_log = make_shared<TTBBHist>("h_" + prefix + "_j0b1pt_log", logspace(50, 10, 1000*GeV), "", "leading $bb$-jet " + spt + " [GeV]", dsdx(spt, "\\mathrm{GeV}"));
+        h_j0b2pt_log = make_shared<TTBBHist>("h_" + prefix + "_j0b2pt_log", logspace(50, 10, 1000*GeV), "", "subleading $bb$-jet " + spt + " [GeV]", dsdx(spt, "\\mathrm{GeV}"));
+        h_j1b1pt_log = make_shared<TTBBHist>("h_" + prefix + "_j1b1pt_log", logspace(50, 10, 1000*GeV), "", "leading $b1$-jet " + spt + " [GeV]", dsdx(spt, "\\mathrm{GeV}"));
+        h_j1b2pt_log = make_shared<TTBBHist>("h_" + prefix + "_j1b2pt_log", logspace(50, 10, 1000*GeV), "", "subleading $b1$-jet " + spt + " [GeV]", dsdx(spt, "\\mathrm{GeV}"));
+
         h_jl1eta = make_shared<TTBBHist>("h_" + prefix + "_jl1eta", 30, -3, 3, "", "leading light-jet " + seta, dsdx(seta, "\\mathrm{GeV}"));
         h_jl2eta = make_shared<TTBBHist>("h_" + prefix + "_jl2eta", 30, -3, 3, "", "subleading light-jet " + seta, dsdx(seta, "\\mathrm{GeV}"));
         h_jb1eta = make_shared<TTBBHist>("h_" + prefix + "_jb1eta", 30, -3, 3, "", "leading $b$-jet " + seta, dsdx(seta, "\\mathrm{GeV}"));
@@ -50,11 +59,16 @@ namespace Rivet {
         h_detatb = make_shared<TTBBHist>("h_" + prefix + "_detatb", 50, 0, 4, "", sdetatb, dsdx(sdetatb, "\\mathrm{1}"));
         h_drtb = make_shared<TTBBHist>("h_" + prefix + "_drtb", 50, 0, 4, "", sdrtb, dsdx(sdrtb, "\\mathrm{1}"));
 
-        h_mbb = make_shared<TTBBHist>("h_" + prefix + "_mbb", 50, 0, 500*GeV, "", smbb + " [GeV]", dsdx(smbb, "\\mathrm{GeV}"));
         h_dphibb = make_shared<TTBBHist>("h_" + prefix + "_dphibb", 50, 0, 4, "", sdphibb, dsdx(sdphibb, "1"));
         h_drbb = make_shared<TTBBHist>("h_" + prefix + "_drbb", 50, 0, 5, "", sdrbb, dsdx(sdrbb, "1"));
+
+        h_mbb = make_shared<TTBBHist>("h_" + prefix + "_mbb", 50, 0, 500*GeV, "", smbb + " [GeV]", dsdx(smbb, "\\mathrm{GeV}"));
         h_ptbb = make_shared<TTBBHist>("h_" + prefix + "_ptbb", 50, 0, 500*GeV, "", sptbb + " [GeV]", dsdx(sptbb, "\\mathrm{GeV}"));
         h_ht = make_shared<TTBBHist>("h_" + prefix + "_ht", 50, 0, 2000*GeV, "", sht + " [GeV]", dsdx(sht, "\\mathrm{GeV}"));
+
+        h_mbb_log = make_shared<TTBBHist>("h_" + prefix + "_mbb_log", logspace(50, 10, 1000*GeV), "", smbb + " [GeV]", dsdx(smbb, "\\mathrm{GeV}"));
+        h_ptbb_log = make_shared<TTBBHist>("h_" + prefix + "_ptbb_log", logspace(50, 10, 1000*GeV), "", sptbb + " [GeV]", dsdx(sptbb, "\\mathrm{GeV}"));
+        h_ht_log = make_shared<TTBBHist>("h_" + prefix + "_ht_log", logspace(50, 10, 2000*GeV), "", sht + " [GeV]", dsdx(sht, "\\mathrm{GeV}"));
       }
 
       void fill(double weight, const Jets& jls, const Jets& jbs, const Jets& j0bs, const Jets& j1bs, const Particles& tops) {
@@ -67,16 +81,19 @@ namespace Rivet {
 
         if (jls.size() >= 1) {
           h_jl1pt->fill(jls[0].pt(), weight);
+          h_jl1pt_log->fill(jls[0].pt(), weight);
           h_jl1eta->fill(jls[0].eta(), weight);
         }
 
         if (jls.size() >= 2) {
           h_jl2pt->fill(jls[1].pt(), weight);
+          h_jl2pt_log->fill(jls[1].pt(), weight);
           h_jl2eta->fill(jls[1].eta(), weight);
         }
 
         if (jbs.size() >= 1) {
           h_jb1pt->fill(jbs[0].pt(), weight);
+          h_jb1pt_log->fill(jbs[0].pt(), weight);
           h_jb1eta->fill(jbs[0].eta(), weight);
 
           p_fracj0b->fill(njb, float(j0bs.size())/njb, weight);
@@ -85,26 +102,31 @@ namespace Rivet {
 
         if (jbs.size() >= 2) {
           h_jb2pt->fill(jbs[1].pt(), weight);
+          h_jb2pt_log->fill(jbs[1].pt(), weight);
           h_jb2eta->fill(jbs[1].eta(), weight);
         }
 
         if (j0bs.size() >= 1) {
           h_j0b1pt->fill(j0bs[0].pt(), weight);
+          h_j0b1pt_log->fill(j0bs[0].pt(), weight);
           h_j0b1eta->fill(j0bs[0].eta(), weight);
         }
 
         if (j0bs.size() >= 2) {
           h_j0b2pt->fill(j0bs[1].pt(), weight);
+          h_j0b2pt_log->fill(j0bs[1].pt(), weight);
           h_j0b2eta->fill(j0bs[1].eta(), weight);
         }
 
         if (j1bs.size() >= 1) {
           h_j1b1pt->fill(j1bs[0].pt(), weight);
+          h_j1b1pt_log->fill(j1bs[0].pt(), weight);
           h_j1b1eta->fill(j1bs[0].eta(), weight);
         }
 
         if (j1bs.size() >= 2) {
           h_j1b2pt->fill(j1bs[1].pt(), weight);
+          h_j1b2pt_log->fill(j1bs[1].pt(), weight);
           h_j1b2eta->fill(j1bs[1].eta(), weight);
         }
 
@@ -121,6 +143,7 @@ namespace Rivet {
           ht += bj.pt();
 
         h_ht->fill(ht, weight);
+        h_ht_log->fill(ht, weight);
 
         // find the two leading "b-jets" in the event, where "b-jet" here means
         // the two leading jets with at least one b-quark constituent, with jets
@@ -160,10 +183,14 @@ namespace Rivet {
           h_detatb->fill(mindrdeta, weight);
         }
 
-        h_mbb->fill((b1 + b2).mass(), weight);
         h_dphibb->fill(abs(deltaPhi(b1, b2)), weight);
         h_drbb->fill(deltaR(b1, b2), weight);
+
+        h_mbb->fill((b1 + b2).mass(), weight);
         h_ptbb->fill((b1 + b2).pt(), weight);
+
+        h_mbb_log->fill((b1 + b2).mass(), weight);
+        h_ptbb_log->fill((b1 + b2).pt(), weight);
 
       };
 
@@ -172,12 +199,16 @@ namespace Rivet {
       vector<shared_ptr<TTBBHist>> histograms() {
         return
         { h_njl, h_njb, h_nj0b, h_nj1b
-          , h_jl1pt, h_jl2pt, h_jb1pt, h_jb2pt
-            , h_j0b1pt, h_j0b2pt, h_j1b1pt, h_j1b2pt
-            , h_jl1eta, h_jl2eta, h_jb1eta, h_jb2eta
-            , h_j0b1eta, h_j0b2eta, h_j1b1eta, h_j1b2eta
-            , h_dphitb, h_detatb, h_drtb
-            , h_mbb, h_dphibb, h_drbb, h_ptbb, h_ht
+        , h_jl1pt, h_jl2pt, h_jb1pt, h_jb2pt
+        , h_j0b1pt, h_j0b2pt, h_j1b1pt, h_j1b2pt
+        , h_jl1pt_log, h_jl2pt_log, h_jb1pt_log, h_jb2pt_log
+        , h_j0b1pt_log, h_j0b2pt_log, h_j1b1pt_log, h_j1b2pt_log
+        , h_jl1eta, h_jl2eta, h_jb1eta, h_jb2eta
+        , h_j0b1eta, h_j0b2eta, h_j1b1eta, h_j1b2eta
+        , h_dphitb, h_detatb, h_drtb
+        , h_dphibb, h_drbb
+        , h_mbb, h_ptbb, h_ht
+        , h_mbb_log, h_ptbb_log, h_ht_log
         };
       }
 
@@ -195,10 +226,14 @@ namespace Rivet {
         h_njl, h_njb, h_nj0b, h_nj1b
         , h_jl1pt, h_jl2pt, h_jb1pt, h_jb2pt
         , h_j0b1pt, h_j0b2pt, h_j1b1pt, h_j1b2pt
+        , h_jl1pt_log, h_jl2pt_log, h_jb1pt_log, h_jb2pt_log
+        , h_j0b1pt_log, h_j0b2pt_log, h_j1b1pt_log, h_j1b2pt_log
         , h_jl1eta, h_jl2eta, h_jb1eta, h_jb2eta
         , h_j0b1eta, h_j0b2eta, h_j1b1eta, h_j1b2eta
         , h_dphitb, h_detatb, h_drtb
-        , h_mbb, h_dphibb, h_drbb, h_ptbb, h_ht;
+        , h_dphibb, h_drbb
+        , h_mbb, h_ptbb, h_ht
+        , h_mbb_log, h_ptbb_log, h_ht_log;
 
       Profile1DPtr p_fracj0b, p_fracj1b;
 

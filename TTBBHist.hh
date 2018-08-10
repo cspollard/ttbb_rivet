@@ -21,6 +21,17 @@ Histo1DPtr histo1D(
     return h;
   }
 
+Histo1DPtr histo1D(
+  const string& name, const vector<double>& binning
+  , const string& title, const string& xlab, const string& ylab) {
+
+    Histo1DPtr h = make_shared<Histo1D>(binning, name, title);
+    h->setAnnotation("XLabel", xlab);
+    h->setAnnotation("YLabel", ylab);
+    return h;
+  }
+
+
 
   // a simple wrapper around a histogram that stores histograms corresponding to
   // positive- and negative-weighted events.
@@ -35,6 +46,14 @@ Histo1DPtr histo1D(
         hnom = histo1D(name, nb, low, high, title, xlab, ylab);
         hpos = histo1D(name + "_onlypos", nb, low, high, title, xlab, ylab);
         hneg = histo1D(name + "_onlyneg", nb, low, high, title, xlab, ylab);
+      }
+
+    TTBBHist(
+      const string& name, const vector<double>& binning
+      , const string& title, const string& xlab, const string& ylab) {
+        hnom = histo1D(name, binning, title, xlab, ylab);
+        hpos = histo1D(name + "_onlypos", binning, title, xlab, ylab);
+        hneg = histo1D(name + "_onlyneg", binning, title, xlab, ylab);
       }
 
       void fill(double xval, double weight) {
