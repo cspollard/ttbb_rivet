@@ -6,9 +6,12 @@
 #include "Rivet/Projections/VetoedFinalState.hh"
 #include "Rivet/Projections/FastJets.hh"
 #include "Rivet/Projections/PartonicTops.hh"
+#include "Rivet/Tools/JetSmearingFunctions.hh"
 #include "TTBBHist.hh"
 
 namespace Rivet {
+
+  using V4s = vector<FourMomentum>;
 
   class TTBBDecayedHists {
     public:
@@ -95,13 +98,11 @@ namespace Rivet {
 
       }
 
-      void fill(double weight, const Jets& jls, const Jets& jbs, const Jets& j2bs, const Jets& j1bs, const vector<DressedLepton>& leps) {
-        size_t njbs = j2bs.size()+j1bs.size();
+      void fill(double weight, const V4s& jls, const V4s& jbs, const vector<DressedLepton>& leps) {
+        size_t njbs = jbs.size();
 
         h_njl->fill(jls.size(), weight);
         h_njb->fill(njbs, weight);
-        h_nj2b->fill(j2bs.size(), weight);
-        h_nj1b->fill(j1bs.size(), weight);
 
         if (jls.size() >= 1) {
           h_jl1pt->fill(jls[0].pt(), weight);
@@ -119,9 +120,6 @@ namespace Rivet {
           h_jb1pt->fill(jbs[0].pt(), weight);
           h_jb1pt_log->fill(jbs[0].pt(), weight);
           h_jb1eta->fill(jbs[0].eta(), weight);
-
-          p_fracj1b->fill(njbs, float(j1bs.size())/njbs, weight);
-          p_fracj2b->fill(njbs, float(j2bs.size())/njbs, weight);
         }
 
         if (jbs.size() >= 2) {
@@ -138,50 +136,6 @@ namespace Rivet {
         if (jbs.size() >= 4) {
           h_jb4pt->fill(jbs[3].pt(), weight);
           h_jb4pt_log->fill(jbs[3].pt(), weight);
-        }
-
-        if (j2bs.size() >= 1) {
-          h_j2b1pt->fill(j2bs[0].pt(), weight);
-          h_j2b1pt_log->fill(j2bs[0].pt(), weight);
-          h_j2b1eta->fill(j2bs[0].eta(), weight);
-        }
-
-        if (j2bs.size() >= 2) {
-          h_j2b2pt->fill(j2bs[1].pt(), weight);
-          h_j2b2pt_log->fill(j2bs[1].pt(), weight);
-          h_j2b2eta->fill(j2bs[1].eta(), weight);
-        }
-
-        if (j2bs.size() >= 3) {
-          h_j2b3pt->fill(j2bs[2].pt(), weight);
-          h_j2b3pt_log->fill(j2bs[2].pt(), weight);
-        }
-
-        if (j2bs.size() >= 4) {
-          h_j2b4pt->fill(j2bs[3].pt(), weight);
-          h_j2b4pt_log->fill(j2bs[3].pt(), weight);
-        }
-
-        if (j1bs.size() >= 1) {
-          h_j1b1pt->fill(j1bs[0].pt(), weight);
-          h_j1b1pt_log->fill(j1bs[0].pt(), weight);
-          h_j1b1eta->fill(j1bs[0].eta(), weight);
-        }
-
-        if (j1bs.size() >= 2) {
-          h_j1b2pt->fill(j1bs[1].pt(), weight);
-          h_j1b2pt_log->fill(j1bs[1].pt(), weight);
-          h_j1b2eta->fill(j1bs[1].eta(), weight);
-        }
-
-        if (j1bs.size() >= 3) {
-          h_j1b3pt->fill(j1bs[2].pt(), weight);
-          h_j1b3pt_log->fill(j1bs[2].pt(), weight);
-        }
-
-        if (j1bs.size() >= 4) {
-          h_j1b4pt->fill(j1bs[3].pt(), weight);
-          h_j1b4pt_log->fill(j1bs[3].pt(), weight);
         }
 
         if (leps.size() >= 1) {
@@ -208,8 +162,8 @@ namespace Rivet {
         // find the two leading b-jets
         FourMomentum b1, b2;
         if (jbs.size() >= 2) {
-          b1 = jbs[0].mom();
-          b2 = jbs[1].mom();
+          b1 = jbs[0];
+          b2 = jbs[1];
         } else
           return;
 
@@ -226,7 +180,7 @@ namespace Rivet {
         double mbbsum = 0;
         for (size_t ib = 0; ib < jbs.size(); ib++) {
           for (size_t jb = ib+1; jb < jbs.size(); jb++) {
-            double mbb = (jbs[ib].mom() + jbs[jb].mom()).mass();
+            double mbb = (jbs[ib] + jbs[jb]).mass();
             mbbsum += mbb;
 
             if (100*GeV < mbb && mbb < 150*GeV)
@@ -318,31 +272,27 @@ namespace Rivet {
 
         declare(FastJets(jfs, FastJets::ANTIKT, 0.4), "Jets");
 
-        h_onelep_inclusive = TTBBDecayedHists("onelep_inclusive");
-        h_onelep_eq4j = TTBBDecayedHists("onelep_eq4j");
-        h_onelep_eq5j = TTBBDecayedHists("onelep_eq5j");
-        h_onelep_ge6j = TTBBDecayedHists("onelep_ge6j");
-        h_onelep_eq3jb = TTBBDecayedHists("onelep_eq3jb");
-        h_onelep_ge4jb = TTBBDecayedHists("onelep_ge4jb");
-        h_onelep_eq5j_eq3jb = TTBBDecayedHists("onelep_eq5j_eq3jb");
-        h_onelep_ge6j_eq3jb = TTBBDecayedHists("onelep_ge6j_eq3jb");
-        h_onelep_eq5j_ge4jb = TTBBDecayedHists("onelep_eq5j_ge4jb");
-        h_onelep_ge6j_ge4jb = TTBBDecayedHists("onelep_ge6j_ge4jb");
+        histmap = map< string , TTBBDecayedHists >();
 
-        h_dilep_inclusive = TTBBDecayedHists("dilep_inclusive");
-        h_dilep_eq2j = TTBBDecayedHists("dilep_eq2j");
-        h_dilep_eq3j = TTBBDecayedHists("dilep_eq3j");
-        h_dilep_ge4j = TTBBDecayedHists("dilep_ge4j");
-        h_dilep_eq3jb = TTBBDecayedHists("dilep_eq3jb");
-        h_dilep_ge4jb = TTBBDecayedHists("dilep_ge4jb");
-        h_dilep_eq3j_eq3jb = TTBBDecayedHists("dilep_eq3j_eq3jb");
-        h_dilep_ge4j_eq3jb = TTBBDecayedHists("dilep_ge4j_eq3jb");
-        h_dilep_ge4j_ge4jb = TTBBDecayedHists("dilep_ge4j_ge4jb");
+        histmap["onelep_inclusive"] = TTBBDecayedHists("onelep_inclusive");
+        histmap["onelep_ge6j_eq2jb"] = TTBBDecayedHists("onelep_ge6j_eq2jb");
+        histmap["onelep_ge6j_eq3jb"] = TTBBDecayedHists("onelep_ge6j_eq3jb");
+        histmap["onelep_ge6j_ge4jb"] = TTBBDecayedHists("onelep_ge6j_ge4jb");
+
+        histmap["dilep_inclusive"] = TTBBDecayedHists("dilep_inclusive");
+        histmap["dilep_ge4j_eq2jb"] = TTBBDecayedHists("dilep_ge4j_eq2jb");
+        histmap["dilep_ge4j_eq3jb"] = TTBBDecayedHists("dilep_ge4j_eq3jb");
+        histmap["dilep_ge4j_ge4jb"] = TTBBDecayedHists("dilep_ge4j_ge4jb");
+
 
       }
 
 
       void analyze(const Event& event) {
+
+        // 70% b-tagging efficiency, 5% charm mistag rate
+        JET_BTAG_EFFS tagger(0.85, 0.05, 0.0);
+
 
         double weight = event.weight();
 
@@ -360,61 +310,38 @@ namespace Rivet {
         // j1bs = jets with exactly one associated b-hadron
         // j2bs = jets with at least two associated b-hadrons
 
-        vector<Jets> j25cats = jet_categories(jets);
-        Jets jls = j25cats[0];
-        Jets jbs = j25cats[1];
-        Jets j2bs = j25cats[2];
-        Jets j1bs = j25cats[3];
-
+        vector<V4s> j25cats = jet_categories(jets, 1.0, tagger);
+        V4s jls = j25cats[0];
+        V4s jbs = j25cats[1];
+        int njets = jls.size() + jbs.size();
 
         if (leps.size() == 1) {
-          h_onelep_inclusive.fill(weight, jls, jbs, j2bs, j1bs, leps);
+          histmap["onelep_inclusive"].fill(weight, jls, jbs, leps);
 
-          if (jets.size() == 4) h_onelep_eq4j.fill(weight, jls, jbs, j2bs, j1bs, leps);
-          else if (jets.size() == 5) h_onelep_eq5j.fill(weight, jls, jbs, j2bs, j1bs, leps);
-          else if (jets.size() >= 6) h_onelep_ge6j.fill(weight, jls, jbs, j2bs, j1bs, leps);
-
-          if (jbs.size() == 3) h_onelep_eq3jb.fill(weight, jls, jbs, j2bs, j1bs, leps);
-          else if (jbs.size() >= 4) h_onelep_ge4jb.fill(weight, jls, jbs, j2bs, j1bs, leps);
-
-          if (jets.size() == 5 && jbs.size() == 3) h_onelep_eq5j_eq3jb.fill(weight, jls, jbs, j2bs, j1bs, leps);
-          if (jets.size() == 5 && jbs.size() >= 4) h_onelep_eq5j_ge4jb.fill(weight, jls, jbs, j2bs, j1bs, leps);
-          if (jets.size() >= 6 && jbs.size() == 3) h_onelep_ge6j_eq3jb.fill(weight, jls, jbs, j2bs, j1bs, leps);
-          if (jets.size() >= 6 && jbs.size() >= 4) h_onelep_ge6j_ge4jb.fill(weight, jls, jbs, j2bs, j1bs, leps);
+          if (njets >= 6) {
+            if (jbs.size() == 2) histmap["onelep_ge6j_eq2jb"].fill(weight, jls, jbs, leps);
+            else if (jbs.size() == 3) histmap["onelep_ge6j_eq3jb"].fill(weight, jls, jbs, leps);
+            else if (jbs.size() >= 4) histmap["onelep_ge6j_ge4jb"].fill(weight, jls, jbs, leps);
+          }
 
         } else if (leps.size() == 2) {
-          h_dilep_inclusive.fill(weight, jls, jbs, j2bs, j1bs, leps);
+          histmap["dilep_inclusive"].fill(weight, jls, jbs, leps);
 
-          if (jets.size() == 2) h_dilep_eq2j.fill(weight, jls, jbs, j2bs, j1bs, leps);
-          else if (jets.size() == 3) h_dilep_eq3j.fill(weight, jls, jbs, j2bs, j1bs, leps);
-          else if (jets.size() >= 4) h_dilep_ge4j.fill(weight, jls, jbs, j2bs, j1bs, leps);
+          if (njets >= 4) {
+            if (jbs.size() == 2) histmap["dilep_ge4j_eq2jb"].fill(weight, jls, jbs, leps);
+            else if (jbs.size() == 3) histmap["dilep_ge4j_eq3jb"].fill(weight, jls, jbs, leps);
+            else if (jbs.size() >= 4) histmap["dilep_ge4j_ge4jb"].fill(weight, jls, jbs, leps);
+          }
 
-          if (jbs.size() == 3) h_dilep_eq3jb.fill(weight, jls, jbs, j2bs, j1bs, leps);
-          else if (jbs.size() >= 4) h_dilep_ge4jb.fill(weight, jls, jbs, j2bs, j1bs, leps);
-
-          if (jets.size() == 3 && jbs.size() == 3) h_dilep_eq3j_eq3jb.fill(weight, jls, jbs, j2bs, j1bs, leps);
-          if (jets.size() >= 4 && jbs.size() == 3) h_dilep_ge4j_eq3jb.fill(weight, jls, jbs, j2bs, j1bs, leps);
-          if (jets.size() >= 4 && jbs.size() >= 4) h_dilep_ge4j_ge4jb.fill(weight, jls, jbs, j2bs, j1bs, leps);
         }
-
 
         return;
       }
 
       void finalize() {
-        vector<TTBBDecayedHists> hists =
-        { h_onelep_inclusive
-        , h_onelep_eq4j, h_onelep_eq5j, h_onelep_ge6j
-        , h_onelep_eq3jb, h_onelep_ge4jb
-        , h_onelep_eq5j_eq3jb, h_onelep_ge6j_eq3jb
-        , h_onelep_eq5j_ge4jb, h_onelep_ge6j_ge4jb
-        , h_dilep_inclusive
-        , h_dilep_eq2j, h_dilep_eq3j, h_dilep_ge4j
-        , h_dilep_eq3jb, h_dilep_ge4jb
-        , h_dilep_eq3j_eq3jb, h_dilep_ge4j_eq3jb, h_dilep_ge4j_ge4jb
-        };
+        for (pair<const string, TTBBDecayedHists>& keyval: histmap) {
+          TTBBDecayedHists& ttbbhists = keyval.second;
 
-        for (TTBBDecayedHists& ttbbhists: hists) {
           for (shared_ptr<TTBBHist>& ttbbhist: ttbbhists.histograms()) {
             Histo1DPtr ph = ttbbhist->nominal();
             ph->setPath(histoDir() + ph->path());
@@ -442,39 +369,29 @@ namespace Rivet {
       }
 
     private:
-      TTBBDecayedHists
-          h_onelep_inclusive
-        , h_onelep_eq4j, h_onelep_eq5j, h_onelep_ge6j
-        , h_onelep_eq3jb, h_onelep_ge4jb
-        , h_onelep_eq5j_eq3jb, h_onelep_ge6j_eq3jb
-        , h_onelep_eq5j_ge4jb, h_onelep_ge6j_ge4jb;
+      map< string , TTBBDecayedHists > histmap;
 
-      TTBBDecayedHists
-          h_dilep_inclusive
-        , h_dilep_eq2j, h_dilep_eq3j, h_dilep_ge4j
-        , h_dilep_eq3jb, h_dilep_ge4jb
-        , h_dilep_eq3j_eq3jb, h_dilep_ge4j_eq3jb, h_dilep_ge4j_ge4jb;
+      vector<V4s> jet_categories(
+          const Jets& jets
+        , float etscale
+        , JET_BTAG_EFFS tagrates
+        ) {
 
-
-      vector<Jets> jet_categories(const Jets& jets) {
-        Jets jls, jbs, j2bs, j1bs;
+        V4s jls, jbs;
         for (const Jet& j: jets) {
-          size_t absnbs = j.bTags(Cuts::pT > 5*GeV).size();
+          FourMomentum mom = j.mom()*etscale;
 
-          if (absnbs == 0) jls.push_back(j);
-
-          else {
-            jbs.push_back(j);
-            if (absnbs == 1) j1bs.push_back(j);
-            else j2bs.push_back(j);
-          }
+          if (efffilt(j, tagrates)) 
+            jbs.push_back(mom);
+          else
+            jls.push_back(mom);
         }
 
-        return {jls, jbs, j2bs, j1bs};
+        return {jls, jbs};
       }
-
 
   };
 
   DECLARE_RIVET_PLUGIN(MCTTBBDecayed);
 }
+
