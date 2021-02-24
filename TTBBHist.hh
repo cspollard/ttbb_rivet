@@ -10,6 +10,7 @@ string sdrbb = "\\ensuremath{\\Delta R(b,b)}";
 string sptbb = "\\ensuremath{p_{\\mathrm{T}, bb}}";
 string smbb = "\\ensuremath{m_{bb}}";
 string sht = "\\ensuremath{h_\\mathrm{T}}";
+string shtlep = "\\ensuremath{h_\\mathrm{T} ^\\mathrm{lep}}";
 
 Histo1DPtr histo1D(
   const string& name, size_t nb, double low, double high
