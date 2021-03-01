@@ -14,25 +14,25 @@ namespace Rivet {
 
   using StringMap = map< string , string >;
 
-  string spt = "\\ensuremath{p_\\mathrm{T}}";
-  string seta = "\\ensuremath{\\eta}";
-  string sdphitb = "\\ensuremath{|\\Delta\\phi(t,b)|}";
-  string sdetatb = "\\ensuremath{|\\Delta\\eta(t,b)|}";
-  string sdrtb = "\\ensuremath{|\\Delta R(t,b)|}";
-  string sdphibb = "\\ensuremath{|\\Delta\\phi(b,b)|}";
-  string sdrbb = "\\ensuremath{\\Delta R(b,b)}";
-  string sptbb = "\\ensuremath{p_{\\mathrm{T}, bb}}";
-  string smbb = "\\ensuremath{m_{bb}}";
-  string sht = "\\ensuremath{h_\\mathrm{T}}";
-  string shtlep = "\\ensuremath{h_\\mathrm{T} ^\\mathrm{lep}}";
-
-  string dsdx(const string& x, const string& xunit) {
-    return "\\ensuremath{\\frac{d\\sigma}{d" + x + "} \\frac{{pb}}{" + xunit + "}}";
-  }
-
-
   class MCTTBB3 : public Analysis {
     private:
+
+      string spt = "\\ensuremath{p_\\mathrm{T}}";
+      string seta = "\\ensuremath{\\eta}";
+      string sdphitb = "\\ensuremath{|\\Delta\\phi(t,b)|}";
+      string sdetatb = "\\ensuremath{|\\Delta\\eta(t,b)|}";
+      string sdrtb = "\\ensuremath{|\\Delta R(t,b)|}";
+      string sdphibb = "\\ensuremath{|\\Delta\\phi(b,b)|}";
+      string sdrbb = "\\ensuremath{\\Delta R(b,b)}";
+      string sptbb = "\\ensuremath{p_{\\mathrm{T}, bb}}";
+      string smbb = "\\ensuremath{m_{bb}}";
+      string sht = "\\ensuremath{h_\\mathrm{T}}";
+      string shtlep = "\\ensuremath{h_\\mathrm{T} ^\\mathrm{lep}}";
+
+      string dsdx(const string& x, const string& xunit) {
+        return "\\ensuremath{\\frac{d\\sigma}{d" + x + "} \\frac{{pb}}{" + xunit + "}}";
+      }
+
 
       RegMap regions;
 
