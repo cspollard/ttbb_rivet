@@ -1,3 +1,9 @@
+"""
+Usage:
+
+python slimMCTTBBDecayed.py infile.yoda outfile.yoda
+"""
+
 import yoda
 
 from sys import argv
